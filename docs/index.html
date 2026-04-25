@@ -1,0 +1,2196 @@
+<!DOCTYPE html>
+<html lang="ja"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>solarich 300</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:   #0D0D0D;
+      --mid:   #555;
+      --muted: #999;
+      --sky:   #56C2EC;   /* ソラブルー */
+      --deep:  #0C3B52;   /* 深空ネイビー */
+      --sky-m: #1A8FC4;   /* ミッドスカイ */
+      --off:   #F5F4F0;
+      --white: #FFFFFF;
+      --font:  'Noto Sans JP', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font);
+      color: var(--ink);
+      background: var(--white);
+      overflow-x: hidden;
+    }
+
+    /* ─── INTRO ──────────────────────────────────── */
+    #intro {
+      position: fixed; inset: 0; z-index: 9999;
+      background: linear-gradient(170deg, var(--deep) 0%, var(--sky-m) 60%, var(--sky) 100%);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      transition: opacity 1s ease 0.2s;
+    }
+    #intro.fade-out { opacity: 0; pointer-events: none; }
+    .intro-logo { width: 160px; opacity: 0; animation: fadeUp .8s ease .3s forwards; }
+    .intro-tag { display: none; }  /* ロゴのみに */
+    .intro-num { display: none; }
+    .intro-line { display: none; }
+    .intro-skip {
+      position: absolute; bottom: 44px;
+      background: none; border: none; color: rgba(255,255,255,.3);
+      font-size: 11px; font-family: var(--font); letter-spacing: .2em;
+      cursor: pointer; transition: color .3s; padding: 10px 0;
+      opacity: 0; animation: fadeUp .6s ease 1.2s forwards;
+    }
+    .intro-skip:hover { color: rgba(255,255,255,.7); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes lineGrow { to { height: 60px; } }
+    @keyframes floatY {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-14px); }
+    }
+    @keyframes btnPulse {
+      0%,100% { box-shadow: 0 4px 20px rgba(86,194,236,.3); }
+      50%      { box-shadow: 0 4px 36px rgba(86,194,236,.62), 0 0 0 10px rgba(86,194,236,.07); }
+    }
+    @keyframes shimmerSlide {
+      from { left: -120%; }
+      to   { left: 180%; }
+    }
+    @keyframes countFade {
+      from { opacity: 0; transform: translateY(12px) scale(.9); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    /* ─── REVEAL system ─────────────────────────── */
+    .reveal {
+      opacity: 0; transform: translateY(24px);
+      transition: opacity .85s cubic-bezier(.22,1,.36,1), transform .85s cubic-bezier(.22,1,.36,1);
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+    /* 左右スライド variant */
+    .reveal-left  { opacity: 0; transform: translateX(-32px); transition: opacity .85s cubic-bezier(.22,1,.36,1), transform .85s cubic-bezier(.22,1,.36,1); }
+    .reveal-left.visible  { opacity: 1; transform: none; }
+    .reveal-right { opacity: 0; transform: translateX(32px);  transition: opacity .85s cubic-bezier(.22,1,.36,1), transform .85s cubic-bezier(.22,1,.36,1); }
+    .reveal-right.visible { opacity: 1; transform: none; }
+    /* スケール variant */
+    .reveal-scale { opacity: 0; transform: scale(.95); transition: opacity .8s cubic-bezier(.22,1,.36,1), transform .8s cubic-bezier(.22,1,.36,1); }
+    .reveal-scale.visible { opacity: 1; transform: none; }
+
+    /* ─── LAYOUT ─────────────────────────────────── */
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 0 48px; }
+
+    /* ─── NEW BADGE ──────────────────────────────── */
+    .new-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 10px; letter-spacing: .28em; text-transform: uppercase;
+      color: var(--sky); border: 1px solid rgba(86,194,236,.4);
+      padding: 5px 14px 5px 10px; border-radius: 20px;
+      margin-bottom: 20px; width: fit-content;
+    }
+    .nb-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--sky); flex-shrink: 0;
+      animation: nbPulse 2.5s ease-in-out infinite;
+    }
+    @keyframes nbPulse {
+      0%,100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.8); opacity: .4; }
+    }
+
+    /* ─── HERO ───────────────────────────────────── */
+    .hero { display: grid; grid-template-columns: 1fr 1fr; min-height: 100svh; }
+    .hero-left {
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 100px 56px 80px 80px;
+      /* 左カラムだけ空グラデ → 右は純白で製品白背景と完全一致 */
+      background: linear-gradient(160deg, #B5DFFA 0%, #CBE9F7 40%, #E2F4FB 100%);
+    }
+    .hero-eyebrow {
+      font-size: 10px; letter-spacing: .35em; color: var(--sky);
+      text-transform: uppercase; margin-bottom: 6px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .hero-eyebrow::before {
+      content: ''; width: 20px; height: 1px; background: var(--sky); flex-shrink: 0;
+    }
+    .hero-limited {
+      font-size: 11px; letter-spacing: .2em; color: var(--muted);
+      text-transform: uppercase; margin-bottom: 28px;
+    }
+    .hero-title {
+      font-size: clamp(36px, 4.2vw, 64px); font-weight: 900;
+      line-height: 1.2; letter-spacing: -.02em; margin-bottom: 24px;
+    }
+    .hero-desc {
+      font-size: 15px; color: var(--mid); line-height: 1.95;
+      margin-bottom: 36px; max-width: 400px;
+    }
+    .hero-price { font-size: 34px; font-weight: 700; letter-spacing: -.02em; }
+    .hero-price-note { font-size: 13px; color: var(--muted); margin-left: 6px; font-weight: 400; }
+    .hero-gift { font-size: 12px; color: var(--sky); margin: 8px 0 32px; letter-spacing: .05em; }
+    .btn-primary {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 16px 40px; min-width: 200px;
+      background: var(--ink); color: #fff;
+      font-size: 14px; font-weight: 700; letter-spacing: .12em;
+      font-family: var(--font); text-decoration: none;
+      position: relative; overflow: hidden;
+      transition: background .3s, transform .25s cubic-bezier(.22,1,.36,1), box-shadow .3s;
+    }
+    .btn-primary::after {
+      content: '';
+      position: absolute; top: 0; left: -120%; width: 65%; height: 100%;
+      background: linear-gradient(100deg, transparent, rgba(255,255,255,.22), transparent);
+      pointer-events: none;
+      transition: left .55s ease;
+    }
+    .btn-primary:hover { background: var(--deep); transform: translateY(-3px); box-shadow: 0 8px 28px rgba(12,59,82,.3); }
+    .btn-primary:hover::after { left: 180%; }
+    .btn-primary:active { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(12,59,82,.2); }
+    /* ヒーローCTA: ブランドブルー + パルスグロー */
+    .hero-left .btn-primary {
+      background: var(--sky);
+      align-self: flex-start;
+      animation: btnPulse 3s ease-in-out infinite;
+    }
+    .hero-left .btn-primary:hover {
+      background: var(--sky-m);
+      box-shadow: 0 10px 36px rgba(86,194,236,.55);
+      animation: none;
+    }
+    .hero-right {
+      /* 白で製品白背景と完全一致。左側グラデとの境界は hero のグラデで自然につながる */
+      background: #FFFFFF; display: flex; align-items: center; justify-content: center;
+      padding: 80px 48px; position: relative; overflow: hidden;
+    }
+    .hero-right-label {
+      position: absolute; bottom: 36px; right: 36px;
+      font-size: 9px; letter-spacing: .25em; color: rgba(0,0,0,.2);
+      text-transform: uppercase;
+    }
+    .hero-img {
+      width: 100%; max-width: 520px;
+      animation: floatY 6s ease-in-out infinite;
+      filter: drop-shadow(0 32px 48px rgba(0,0,0,.10));
+    }
+
+    /* ─── CARRY ──────────────────────────────────── */
+    .carry { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr auto; min-height: 680px; }
+    .carry-photo { overflow: hidden; min-height: 680px; grid-row: 1 / 3; }
+    .carry-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .carry-panel {
+      background: linear-gradient(155deg, #0C3B52 0%, #1577B0 58%, #45ACD5 100%);
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 80px 72px 40px; grid-column: 2; grid-row: 1;
+    }
+    .carry-eyebrow {
+      font-size: 10px; letter-spacing: .35em; color: var(--sky);
+      text-transform: uppercase; margin-bottom: 22px;
+    }
+    .carry-title {
+      font-size: clamp(26px, 6vw, 44px); font-weight: 900;
+      color: #fff; line-height: 1.25; letter-spacing: -.02em; margin-bottom: 22px;
+    }
+    .carry-text { font-size: 14px; color: rgba(255,255,255,.75); line-height: 2; margin-bottom: 48px; }
+    .carry-nums {
+      display: flex; gap: 40px;
+      background: linear-gradient(155deg, #0C3B52 0%, #1577B0 58%, #45ACD5 100%);
+      border-top: 1px solid rgba(255,255,255,.08);
+      padding: 40px 72px 56px;
+      grid-column: 2; grid-row: 2;
+    }
+    .hero-img-sp { display: none; }
+    .carry-num { font-size: 42px; font-weight: 700; color: #fff; line-height: 1; }
+    .carry-unit { font-size: 16px; font-weight: 300; }
+    .carry-label { font-size: 10px; color: rgba(255,255,255,.55); margin-top: 6px; letter-spacing: .12em; text-transform: uppercase; }
+
+    /* ─── STATEMENT ──────────────────────────────── */
+    .statement { padding: 96px 48px 80px; text-align: center; background: var(--off); }
+    .st-label { font-size: 10px; letter-spacing: .35em; color: var(--sky); text-transform: uppercase; margin-bottom: 32px; display: block; }
+    .st-title {
+      font-size: clamp(26px, 6vw, 44px); font-weight: 900;
+      line-height: 1.35; letter-spacing: -.01em;
+      max-width: 780px; margin: 0 auto 28px;
+    }
+    .st-body { font-size: 16px; color: var(--mid); line-height: 2; max-width: 520px; margin: 0 auto 56px; }
+    .st-video { max-width: 860px; margin: 0 auto; border-radius: 4px; overflow: hidden; background: #111; }
+    .st-video video { width: 100%; display: block; }
+
+    /* ─── WEIGHT SECTION ─────────────────────────── */
+    .weight-section {
+      display: grid; grid-template-columns: 1fr 1fr;
+      min-height: 70vh; align-items: stretch;
+    }
+    .wt-content {
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 80px 72px; color: var(--ink);
+      background: var(--off);
+    }
+    .wt-label { font-size: 10px; letter-spacing: .35em; color: var(--sky); text-transform: uppercase; margin-bottom: 20px; }
+    .wt-title { font-size: clamp(26px, 6vw, 44px); font-weight: 900; line-height: 1.3; letter-spacing: -.01em; margin-bottom: 24px; }
+    .wt-body { font-size: 14px; color: var(--mid); line-height: 2; max-width: 360px; }
+    .wt-video { overflow: hidden; position: relative; min-height: 480px; background: #111; }
+    .wt-video video { width: 100%; height: 100%; object-fit: cover; display: block; position: absolute; top: 0; left: 0; }
+
+    /* ─── STATS BAR ──────────────────────────────── */
+    .stats-bar { padding: 80px 0; border-bottom: 1px solid #eee; }
+    .stats-inner { display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; }
+    .sn { font-size: 52px; font-weight: 700; letter-spacing: -.03em; line-height: 1; }
+    .su { font-size: 20px; font-weight: 300; }
+    .sl { font-size: 10px; letter-spacing: .18em; color: var(--muted); margin-top: 8px; text-transform: uppercase; }
+    .sd { font-size: 12px; color: var(--mid); margin-top: 6px; line-height: 1.6; }
+
+    /* ─── MARQUEE SCROLL ──────────────────────────── */
+    .marquee-section { padding: 96px 0; overflow: hidden; background: var(--off); }
+    .marquee-head { padding: 0 48px; margin-bottom: 48px; }
+    .m-label { font-size: 10px; letter-spacing: .35em; color: var(--sky); text-transform: uppercase; margin-bottom: 14px; display: block; }
+    .m-title { font-size: clamp(26px, 6vw, 44px); font-weight: 900; letter-spacing: -.01em; }
+    .marquee-outer { overflow: hidden; width: 100%; cursor: grab; }
+    .marquee-outer:active { cursor: grabbing; }
+    .marquee-track {
+      display: flex; gap: 10px;
+      width: max-content;
+      animation: marqueeScroll 45s linear infinite;
+    }
+    @media (hover: hover) {
+      .marquee-outer:hover .marquee-track { animation-play-state: paused; }
+    }
+    @keyframes marqueeScroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    .marquee-item {
+      width: 360px; height: 500px; flex-shrink: 0; overflow: hidden;
+      background: var(--deep);
+    }
+    .marquee-item img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      transition: transform .6s ease;
+    }
+    .marquee-item:hover img { transform: scale(1.04); }
+
+    /* ─── GALLERY ─────────────────────────────────── */
+    .gallery-head { padding: 96px 48px 48px; }
+    .g-label { font-size: 10px; letter-spacing: .35em; color: var(--sky); text-transform: uppercase; margin-bottom: 14px; display: block; }
+    .g-title { font-size: clamp(26px, 6vw, 44px); font-weight: 900; line-height: 1.3; letter-spacing: -.01em; }
+    .gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; grid-auto-flow: row dense; }
+    .g-item { overflow: hidden; background: var(--off); cursor: zoom-in; }
+    .g-item img {
+      width: 100%; height: 100%; display: block;
+      object-fit: contain; padding: 24px;
+      min-height: 300px; max-height: 420px;
+      transition: transform .5s ease;
+    }
+    .g-item:hover img { transform: scale(1.03); }
+    .g-item.photo { background: var(--deep); }
+    .g-item.photo img { object-fit: cover; padding: 0; opacity: .92; transition: opacity .4s ease, transform .5s ease; }
+    .g-item.photo:hover img { opacity: 1; transform: scale(1.04); }
+    .g-item.tall { grid-row: span 2; }
+    .g-item.tall img { min-height: 620px; max-height: none; }
+    .g-item.wide { grid-column: span 2; }
+    .g-item.wide img { max-height: 380px; }
+    .g-item.full { grid-column: 1 / -1; }
+    .g-item.full img { max-height: 500px; }
+    /* ギャラリー：ライフスタイル写真のため photo クラスに統一 */
+
+    /* ─── COVER DESIGN ───────────────────────────── */
+    .design-section { background: var(--off); padding: 80px 0 64px; }
+    .d-eyebrow { font-size: 10px; letter-spacing: .35em; color: var(--sky); text-transform: uppercase; margin-bottom: 20px; }
+    .d-title { font-size: clamp(26px, 6vw, 44px); font-weight: 900; line-height: 1.3; margin-bottom: 16px; }
+    .d-body { font-size: 14px; color: var(--mid); line-height: 2; }
+    /* 9枚タイルグリッド */
+    .dp-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+      max-width: 900px;
+      margin: 40px auto 0;
+    }
+    .dp-tile {
+      overflow: hidden; aspect-ratio: 3/2; background: #e0e0e0;
+      opacity: 0; transform: scale(.93);
+      transition: opacity .6s ease, transform .6s cubic-bezier(.22,1,.36,1);
+    }
+    .dp-tile.visible { opacity: 1; transform: none; }
+    /* 9枚スタッガー: nth-child で遅延 */
+    .dp-tile:nth-child(1) { transition-delay: .05s; }
+    .dp-tile:nth-child(2) { transition-delay: .12s; }
+    .dp-tile:nth-child(3) { transition-delay: .19s; }
+    .dp-tile:nth-child(4) { transition-delay: .26s; }
+    .dp-tile:nth-child(5) { transition-delay: .33s; }
+    .dp-tile:nth-child(6) { transition-delay: .40s; }
+    .dp-tile:nth-child(7) { transition-delay: .47s; }
+    .dp-tile:nth-child(8) { transition-delay: .54s; }
+    .dp-tile:nth-child(9) { transition-delay: .61s; }
+    .dp-tile img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+      transition: transform .55s cubic-bezier(.25,.46,.45,.94);
+    }
+    .dp-tile:hover img { transform: scale(1.08); }
+
+    /* ─── GIFT SECTION ───────────────────────────── */
+    .gift-section {
+      display: grid; grid-template-columns: 1fr 1fr;
+      min-height: 480px; align-items: stretch;
+    }
+    /* 2枚縦積み: 上 65% ライフスタイル、下 35% クローズアップ */
+    .gift-photos { display: grid; grid-template-rows: 65fr 35fr; gap: 3px; overflow: hidden; min-height: 480px; }
+    .gift-photo-main, .gift-photo-sub { overflow: hidden; position: relative; }
+    .gift-photo-main img, .gift-photo-sub img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      transition: transform .65s cubic-bezier(.25,.46,.45,.94);
+    }
+    .gift-photo-main:hover img, .gift-photo-sub:hover img { transform: scale(1.04); }
+    .gift-panel {
+      background: var(--off);
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 80px 72px;
+      border-right: 1px solid #e8e6e2;
+    }
+    .gift-panel-head { }
+    .gift-panel-body { }
+    .gf-eyebrow { font-size: 10px; letter-spacing: .35em; color: var(--sky); text-transform: uppercase; margin-bottom: 20px; }
+    .gf-title { font-size: clamp(26px, 6vw, 44px); font-weight: 900; color: var(--ink); line-height: 1.3; margin-bottom: 16px; }
+    .gf-body { font-size: 14px; color: var(--mid); line-height: 2; margin-bottom: 32px; }
+    .gf-note { font-size: 11px; color: var(--muted); letter-spacing: .1em; }
+
+    /* ─── ATTACHMENTS ────────────────────────────── */
+    .att-section { padding: 96px 0; background: var(--off); }
+    /* グループ写真バナー */
+    .att-banner {
+      width: 100%; height: 420px; overflow: hidden;
+      margin-bottom: 72px; position: relative;
+    }
+    .att-banner img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    .att-banner-label {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 48px 56px 32px;
+      background: linear-gradient(to top, rgba(12,59,82,.7) 0%, transparent 100%);
+      color: #fff; font-size: 13px; letter-spacing: .1em; font-weight: 300;
+    }
+    .att-head { margin-bottom: 48px; }
+    .a-eyebrow { font-size: 10px; letter-spacing: .35em; color: var(--sky); text-transform: uppercase; margin-bottom: 16px; }
+    .a-title { font-size: clamp(26px, 6vw, 44px); font-weight: 900; line-height: 1.3; margin-bottom: 10px; }
+    .a-desc { font-size: 13px; color: var(--mid); line-height: 2; }
+    .att-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .att-item { padding: 0 0 24px; background: var(--off); transition: box-shadow .3s; text-align: center; overflow: hidden; }
+    .att-item:hover { box-shadow: 0 6px 24px rgba(0,0,0,.08); }
+    .att-item img { width: 100%; height: 180px; object-fit: contain; margin-bottom: 20px; background: transparent; padding: 0; display: block; }
+    .att-name { font-size: 13px; font-weight: 700; margin-bottom: 0; line-height: 1.5; }
+    .att-body { display: none; }
+
+    /* ─── SOLAR SETS ─────────────────────────────── */
+    .solar-section { background: var(--off); padding: 96px 0; }
+    .solar-head { margin-bottom: 56px; }
+    .ss-eyebrow { font-size: 10px; letter-spacing: .35em; color: var(--sky); text-transform: uppercase; margin-bottom: 16px; }
+    .ss-title { font-size: clamp(26px, 6vw, 44px); font-weight: 900; line-height: 1.3; margin-bottom: 14px; }
+    .ss-body { font-size: 14px; color: var(--mid); line-height: 2; max-width: 560px; }
+    .solar-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .solar-card { background: var(--white); overflow: hidden; }
+    /* オフホワイト背景 → 白背景JPGが自然に際立つ。padding廃止でトリプル白レイヤー解消 */
+    .solar-img { height: 320px; overflow: hidden; background: var(--off); }
+    .solar-img img { width: 100%; height: 100%; object-fit: contain; padding: 24px; }
+    .solar-info { padding: 32px; }
+    .s-name { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+    .s-text { font-size: 13px; color: var(--mid); line-height: 1.85; margin-bottom: 20px; }
+    .s-price { font-size: 22px; font-weight: 700; }
+    .s-tax { font-size: 12px; color: var(--muted); margin-left: 4px; font-weight: 400; }
+
+    /* ─── VIDEO ──────────────────────────────────── */
+    .video-section {
+      /* 晴れた公園の空 ── 青空から芝生の緑へ */
+      background: linear-gradient(160deg, #3AACD5 0%, #68CAE8 30%, #A8D978 65%, #C8EE88 100%);
+      padding: 96px 0;
+    }
+    .v-head { text-align: center; margin-bottom: 48px; }
+    .v-eyebrow { font-size: 10px; letter-spacing: .35em; color: rgba(255,255,255,.75); text-transform: uppercase; margin-bottom: 16px; }
+    .v-title { font-size: clamp(26px, 6vw, 44px); font-weight: 900; color: #fff; letter-spacing: -.01em; text-shadow: 0 1px 8px rgba(0,0,0,.15); }
+    .video-wrap { max-width: 1000px; margin: 0 auto; }
+    .video-wrap video { width: 100%; display: block; border-radius: 2px; }
+
+    /* ─── PACKAGE ────────────────────────────────── */
+    .pkg { display: grid; grid-template-columns: 1fr 1fr; min-height: 60vh; align-items: stretch; }
+    /* オフホワイト背景 → 白背景パッケージ画像が輪郭を持って浮き上がる */
+    .pkg-photo { background: #fff; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+    .pkg-photo img {
+      width: 100%; height: 100%; min-height: 480px;
+      object-fit: contain; display: block;
+      padding: 48px;
+    }
+    .pkg-text { padding: 80px 72px; display: flex; flex-direction: column; justify-content: center; }
+    .pkg-text-head { }
+    .pkg-text-body { }
+    .pk-eyebrow { font-size: 10px; letter-spacing: .35em; color: var(--sky); text-transform: uppercase; margin-bottom: 20px; }
+    .pk-title { font-size: clamp(26px, 6vw, 44px); font-weight: 900; line-height: 1.3; margin-bottom: 20px; }
+    .pk-body { font-size: 14px; color: var(--mid); line-height: 2; }
+
+    /* ─── CONTENTS ───────────────────────────────── */
+    .contents-section { padding: 96px 0; background: var(--white); }
+    .cnt-head { text-align: center; margin-bottom: 56px; }
+    .cnt-eyebrow { font-size: 10px; letter-spacing: .35em; color: var(--sky); text-transform: uppercase; margin-bottom: 16px; }
+    .cnt-title { font-size: clamp(26px, 6vw, 44px); font-weight: 900; }
+    /* スプレッドシートグリッドを廃止 → 左ダッシュ付きクリーンリスト */
+    .contents-list {
+      max-width: 560px; margin: 0 auto; list-style: none;
+      display: grid; grid-template-columns: 1fr 1fr; column-gap: 48px;
+    }
+    .contents-list li {
+      padding: 13px 0;
+      font-size: 14px; color: var(--mid);
+      border-bottom: 1px solid #f0eeea;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .contents-list li:empty { display: none; }
+    .contents-list li:last-child:nth-child(odd) { grid-column: 1 / -1; }
+    .contents-list li::before {
+      content: '—'; color: var(--sky); font-size: 12px; flex-shrink: 0;
+    }
+
+    /* ─── SPECS ──────────────────────────────────── */
+    .specs-section { background: var(--off); padding: 96px 0; }
+    .sp-head { text-align: center; margin-bottom: 56px; }
+    .sp-eyebrow { font-size: 10px; letter-spacing: .35em; color: var(--sky); text-transform: uppercase; margin-bottom: 16px; }
+    .sp-title { font-size: clamp(26px, 6vw, 44px); font-weight: 900; }
+    .specs-inner { max-width: 800px; margin: 0 auto; }
+    .spec-group { border-bottom: 1px solid #ddd; }
+    .spec-group summary {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 20px 0; cursor: pointer; list-style: none;
+      font-size: 14px; font-weight: 700;
+    }
+    .spec-group summary::-webkit-details-marker { display: none; }
+    .spec-group summary::after { content: '+'; font-size: 18px; color: var(--muted); font-weight: 300; }
+    details[open] > summary::after { content: '−'; }
+    .spec-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+    .spec-table tr { border-bottom: 1px solid #e8e8e8; }
+    .spec-table tr:last-child { border-bottom: none; }
+    .spec-table td { padding: 13px 4px; font-size: 13px; vertical-align: top; line-height: 1.7; }
+    .spec-table td:first-child { width: 36%; color: var(--muted); }
+
+    /* ─── CTA ────────────────────────────────────── */
+    .cta-section {
+      position: relative; overflow: hidden;
+      background: var(--deep);
+      padding: 140px 48px; text-align: center;
+    }
+    .cta-bg {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%; object-fit: cover; object-position: center 30%;
+      opacity: .32; pointer-events: none; user-select: none;
+    }
+    .cta-content { position: relative; z-index: 1; }
+    .cta-eyebrow { font-size: 10px; letter-spacing: .35em; color: rgba(255,255,255,.65); text-transform: uppercase; margin-bottom: 24px; }
+    .cta-title { font-size: clamp(28px, 4.5vw, 56px); font-weight: 900; color: #fff; line-height: 1.25; margin-bottom: 16px; }
+    .cta-sub { font-size: 14px; color: rgba(255,255,255,.65); margin-bottom: 48px; line-height: 2; }
+    .btn-white {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 18px 52px;
+      background: #fff; color: var(--deep);
+      font-size: 14px; font-weight: 700; letter-spacing: .12em;
+      font-family: var(--font); text-decoration: none;
+      position: relative; overflow: hidden;
+      transition: background .3s, color .3s, transform .25s cubic-bezier(.22,1,.36,1), box-shadow .3s;
+    }
+    .btn-white::after {
+      content: '';
+      position: absolute; top: 0; left: -120%; width: 65%; height: 100%;
+      background: linear-gradient(100deg, transparent, rgba(255,255,255,.45), transparent);
+      pointer-events: none; transition: left .55s ease;
+    }
+    .btn-white:hover { background: var(--ink); color: #fff; transform: translateY(-3px); box-shadow: 0 10px 32px rgba(0,0,0,.28); }
+    .btn-white:hover::after { left: 180%; }
+    .btn-white:active { transform: translateY(-1px); }
+    .cta-note { font-size: 12px; color: rgba(255,255,255,.4); margin-top: 20px; }
+
+    /* ─── FOOTER ─────────────────────────────────── */
+    footer { background: #091E2A; padding: 48px; text-align: center; }
+    .footer-logo { margin-bottom: 20px; }
+    .footer-logo img { height: 20px; opacity: .3; }
+    footer p { font-size: 11px; color: rgba(255,255,255,.2); line-height: 2; }
+    footer a { color: rgba(255,255,255,.2); text-decoration: none; margin: 0 10px; }
+    footer a:hover { color: rgba(255,255,255,.6); }
+
+    /* ─── RESPONSIVE ─────────────────────────────── */
+    @media (max-width: 960px) {
+      /* ── HERO ── テキスト先・画像後・パディング最小化でギャップ解消 */
+      .hero { grid-template-columns: 1fr; min-height: auto; }
+      .hero-left {
+        padding: 56px 28px 20px; order: 1;
+        background: linear-gradient(180deg, #CBE9F7 0%, #E8F7FD 65%, #F8FBFE 100%);
+      }
+      .hero-right { display: none; }
+      .hero-img-sp {
+        display: block; width: calc(100% + 56px); max-width: calc(100% + 56px);
+        margin: 20px -28px 24px;
+      }
+      .carry { display: flex; flex-direction: column; min-height: 0; }
+      .carry-panel { padding: 56px 28px 32px; order: 1; }
+      .carry-photo { min-height: 340px; order: 2; }
+      .carry-nums { order: 3; gap: 24px; border-top: none; padding: 28px 28px 48px; }
+      /* gallery: .wide は mobile で 1col に */
+      .g-item.wide { grid-column: span 1; }
+      .g-item.wide img { max-height: 300px; }
+      .stats-inner { grid-template-columns: repeat(2, 1fr); gap: 40px 0; }
+      .marquee-item { width: 280px; height: 380px; }
+      .gallery-grid { grid-template-columns: 1fr 1fr; gap: 2px; }
+      .g-item.tall { grid-row: span 1; }
+      .g-item.tall img { min-height: 300px; }
+      .g-item.full { grid-column: span 1; }
+      .g-item.full img { max-height: 340px; }
+      .design-section { padding: 64px 0 48px; }
+      .design-text { padding: 0 24px 40px; }
+      .dp-grid { max-width: 100%; gap: 3px; }
+      .gift-section { display: flex; flex-direction: column; }
+      .gift-panel { display: contents; }
+      .gift-panel-head { order: 1; background: var(--off); padding: 48px 28px 24px; }
+      .gift-photos { order: 2; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; gap: 3px; height: 56vw; min-height: 220px; max-height: 380px; }
+      .gift-panel-body { order: 3; background: var(--off); padding: 24px 28px 48px; display: flex; flex-direction: column; }
+      .att-banner { height: 56vw; min-height: 240px; max-height: 420px; margin-bottom: 48px; }
+      .att-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .solar-grid { grid-template-columns: 1fr; }
+      .pkg { display: flex; flex-direction: column; }
+      .pkg-text { display: contents; }
+      .pkg-text-head { order: 1; padding: 48px 28px 24px; }
+      .pkg-photo { order: 2; }
+      .pkg-text-body { order: 3; padding: 24px 28px 48px; }
+      .contents-list { grid-template-columns: 1fr; }
+      .wrap { padding: 0 24px; }
+      .statement { padding: 72px 24px 56px; }
+      .st-body { margin-bottom: 40px; }
+      .wt-body br, .hero-desc br { display: none; }
+      .stats-bar { padding: 48px 0; }
+      .weight-section { display: flex; flex-direction: column; }
+      .wt-content { padding: 56px 28px 40px; order: 1; }
+      .wt-video { min-height: 56vw; height: 56vw; order: 2; }
+      .g-item.full img { max-height: 300px; }
+      .pkg-photo img { min-height: 260px; padding: 24px; }
+      .gallery-head { padding: 72px 24px 40px; }
+      .marquee-head { padding: 0 24px; }
+      .cta-section { padding: 100px 28px; }
+      .video-section { padding: 72px 0; }
+      .video-wrap { padding: 0 16px; }
+    }
+    @media (max-width: 600px) {
+      .hero-left { padding: 64px 20px 16px; }
+      .hero-title { font-size: 36px; }
+      .hero-desc { font-size: 14px; }
+      .carry-num { font-size: 34px; }
+      .carry-nums { flex-wrap: wrap; gap: 20px 32px; }
+      .g-item.wide { grid-column: span 1; }   /* span 2 → 空きセル解消 */
+      .g-item.wide img { max-height: 240px; }
+      .g-item img { min-height: 180px; }
+      .dp-grid { grid-template-columns: repeat(3, 1fr); gap: 3px; }
+      .dp-tile { aspect-ratio: 1; }
+      .att-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .solar-img { height: 240px; }
+      .stats-inner { grid-template-columns: 1fr 1fr; gap: 32px 16px; }
+      .sn { font-size: 38px; }
+      .spec-table td:first-child { width: 42%; }
+      .cta-title { font-size: 28px; }
+      .carry-panel { padding: 48px 20px 28px; }
+      .carry-nums { padding: 24px 20px 40px; }
+      .gift-photos { height: 48vw; min-height: 180px; max-height: 300px; }
+      .gift-panel-head { padding: 40px 20px 16px; }
+      .gift-panel-body { padding: 16px 20px 40px; }
+      .hero-img-sp { width: calc(100% + 40px); max-width: calc(100% + 40px); margin: 20px -20px 24px; }
+      .pkg-text-head { padding: 40px 20px 16px; }
+      .pkg-text-body { padding: 16px 20px 40px; }
+      .att-section, .solar-section, .contents-section, .specs-section { padding: 72px 0; }
+      .att-head, .solar-head, .cnt-head, .sp-head { margin-bottom: 40px; }
+      .wrap { padding: 0 20px; }
+    }
+    @media (max-width: 480px) {
+      .dp-grid { grid-template-columns: 1fr 1fr; }
+      .hero-title { font-size: 32px; }
+      .video-section { padding: 60px 0; }
+      .video-wrap { padding: 0 12px; }
+    }
+  </style>
+<style>.ripple-wave{position:absolute;border-radius:50%;background:rgba(255,255,255,.35);transform:scale(0);animation:rippleAnim .55s ease-out forwards;pointer-events:none}@keyframes rippleAnim{to{transform:scale(4);opacity:0}}</style><style id="adm-var-override">:root{--sky:#56C2EC;--deep:#0C3B52;--off:#F5F4F0;--ink:#0D0D0D;}</style><style>.ripple-wave{position:absolute;border-radius:50%;background:rgba(255,255,255,.35);transform:scale(0);animation:rippleAnim .55s ease-out forwards;pointer-events:none}@keyframes rippleAnim{to{transform:scale(4);opacity:0}}</style></head>
+<body class="" style="">
+
+<!-- INTRO ──────────────────────────────────────── -->
+
+
+
+<!-- HERO ───────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-left reveal visible">
+    <div class="new-badge"><span class="nb-dot"></span>New Release 2026</div>
+    <p class="hero-eyebrow" contenteditable="false">Portable Power Station</p>
+    <p class="hero-limited" contenteditable="false">先行販売 — 300台限定</p>
+    <h1 class="hero-title" contenteditable="false">小さい、軽い、<br>持ち運べる。</h1>
+    <p class="hero-desc" contenteditable="false">
+      iPhone 17 Pro とほぼ同じ高さ。<br>
+      リュックにもスーッと入るコンパクト設計。<br>
+      わずか <strong>3.6 kg</strong> で、どこへでも一緒に。
+    </p>
+    <!-- スマホのみ表示：hero-right は非表示になるためここに製品画像 -->
+    <img class="hero-img-sp" src="/assets/e613491bcaf2.jpg" alt="solarich 300" data-adm-img="1" style="">
+    <div>
+      <span class="hero-price" contenteditable="false">¥39,800</span>
+      <span class="hero-price-note" contenteditable="false">税込</span>
+    </div>
+    <p class="hero-gift" contenteditable="false">オリジナルトートバッグ プレゼント中</p>
+    <a href="https://solarich.co.jp/collections/portable-power-300" class="btn-primary" contenteditable="false">購入する →</a>
+  </div>
+  <div class="hero-right">
+    <img class="hero-img" src="/assets/e613491bcaf2.jpg" alt="solarich 300" data-adm-img="1" style="">
+    <span class="hero-right-label">solarich 300</span>
+  </div>
+</section>
+
+
+<!-- CARRY ──────────────────────────────────────── -->
+<!-- フルフォト: object-fit:cover で白枠なし -->
+<div class="carry">
+  <div class="carry-photo">
+    <img src="/assets/533c343399b3.jpg" alt="片手で持てる" data-adm-img="1" style="">
+  </div>
+  <div class="carry-panel">
+    <p class="carry-eyebrow reveal-right visible" contenteditable="false">Portability</p>
+    <h2 class="carry-title reveal-right visible" style="transition-delay:.08s" contenteditable="false">片手でらくらく、<br>どこへでも。</h2>
+    <p class="carry-text reveal-right visible" style="transition-delay:.16s" contenteditable="false">
+      ハンドル付きで片手でも楽に持ち運べる。<br>
+      専用オリジナルバッグで肩掛けも可能。<br>
+      キャンプ、旅行、防災備蓄——<br>
+      どんなシーンにも自然と馴染みます。
+    </p>
+  </div>
+  <!-- carry-nums は carry-panel の外 → スマホで写真の後に表示 -->
+  <div class="carry-nums reveal visible">
+    <div>
+      <div class="carry-num" contenteditable="false"><span data-to="3.6" data-dec="1" data-suf="">3.6</span><span class="carry-unit"> kg</span></div>
+      <div class="carry-label" contenteditable="false">軽量設計</div>
+    </div>
+    <div>
+      <div class="carry-num" contenteditable="false"><span data-to="204" data-suf="">204</span><span class="carry-unit"> Wh</span></div>
+      <div class="carry-label" contenteditable="false">大容量バッテリー</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- STATEMENT ──────────────────────────────────── -->
+<div class="statement">
+  <span class="st-label reveal visible" contenteditable="false">Designed for Everyday Life</span>
+  <h2 class="st-title reveal visible" contenteditable="false">iPhone 17 Pro と同じ高さ<br>超コンパクトサイズ</h2>
+  <p class="st-body reveal visible" contenteditable="false">
+    「大きい」「重い」「使いづらい」——ポータブル電源へのイメージを、ソラリッチ 300 は覆します。コンパクトなのに、204 Wh の大容量。
+  </p>
+  <div class="st-video reveal visible" style="transition-delay:.12s">
+    <video autoplay="" muted="" loop="" playsinline="">
+      <source src="/assets/c394edd35e26.mp4" type="video/mp4">
+    </video>
+  </div>
+</div>
+
+
+<!-- STATS BAR ──────────────────────────────────── -->
+<div class="stats-bar">
+  <div class="wrap">
+    <div class="stats-inner">
+      <div class="reveal visible">
+        <div class="sn" contenteditable="false"><span data-to="204" data-suf="">204</span><span class="su"> Wh</span></div>
+        <div class="sl" contenteditable="false">バッテリー容量</div>
+        <div class="sd" contenteditable="false">スマホ約15回分の電力</div>
+      </div>
+      <div class="reveal visible" style="transition-delay:.07s">
+        <div class="sn" contenteditable="false"><span data-to="300" data-suf="">300</span><span class="su"> W</span></div>
+        <div class="sl" contenteditable="false">定格出力</div>
+        <div class="sd" contenteditable="false">瞬間最大 500 W 対応</div>
+      </div>
+      <div class="reveal visible" style="transition-delay:.14s">
+        <div class="sn" contenteditable="false"><span data-to="4000" data-suf="">4,000</span><span class="su"> 回</span></div>
+        <div class="sl" contenteditable="false">サイクル寿命</div>
+        <div class="sd" contenteditable="false">毎日使っても約10年</div>
+      </div>
+      <div class="reveal visible" style="transition-delay:.21s">
+        <div class="sn" contenteditable="false">Wi-Fi</div>
+        <div class="sl" contenteditable="false">簡単！スマホ連携</div>
+        <div class="sd" contenteditable="false">節電・ポイ活できる</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- WEIGHT ─────────────────────────────────────── -->
+<section class="weight-section">
+  <div class="wt-content">
+    <p class="wt-label reveal-right visible">Weight</p>
+    <h2 class="wt-title reveal-right visible" style="transition-delay:.08s" contenteditable="false">ポータブル電源を<br><span style="white-space:nowrap">3.6 kg に。</span></h2>
+    <p class="wt-body reveal-right visible" style="transition-delay:.16s">
+      ポータブル電源なのに、リュックにすっぽり入るほど軽量。<br>
+      キャンプ、旅行、防災——毎日の暮らしに、<br>
+      そっと寄り添うサイズ感。
+    </p>
+  </div>
+  <div class="wt-video">
+    <video autoplay="" muted="" loop="" playsinline="">
+      <source src="/assets/d7e9f19bfd3a.mp4" type="video/mp4">
+    </video>
+  </div>
+</section>
+
+
+<!-- MARQUEE LIFESTYLE ───────────────────────────── -->
+<section class="marquee-section">
+  <div class="marquee-head">
+    <span class="m-label reveal visible" contenteditable="false">Lifestyle</span>
+    <h2 class="m-title reveal visible" contenteditable="false">あらゆるシーンで、一緒に。</h2>
+  </div>
+  <div class="marquee-outer">
+    <div class="marquee-track">
+      <!-- オリジナルセット -->
+      <div class="marquee-item"><img src="/assets/533c343399b3.jpg" alt="持ち運び" data-adm-img="1" style=""></div>
+      <div class="marquee-item"><img src="/assets/886e13de796b.jpg" alt="公園で作業" data-adm-img="1" style=""></div>
+      <div class="marquee-item"><img src="/assets/a6a70ddf6e97.jpg" alt="車内で作業" data-adm-img="1" style=""></div>
+      <div class="marquee-item"><img src="/assets/2b85dfcab0f8.jpg" alt="キッチン" data-adm-img="1" style=""></div>
+      <div class="marquee-item"><img src="/assets/8a329f3b395f.jpg" alt="芝生で作業" data-adm-img="1" style=""></div>
+      <div class="marquee-item"><img src="/assets/558d1aa830e0.jpg" alt="複数デバイス充電" data-adm-img="1" style=""></div>
+      <div class="marquee-item"><img src="/assets/ce3ae1210c3f.jpg" alt="本棚" data-adm-img="1" style=""></div>
+      <div class="marquee-item"><img src="/assets/9436be44e856.jpg" alt="アウトドア手持ち" data-adm-img="1" style=""></div>
+      <div class="marquee-item"><img src="/assets/67fb6d13ca20.jpg" alt="キッチンで使う" data-adm-img="1" style=""></div>
+      <div class="marquee-item"><img src="/assets/b4599b263f9b.jpg" alt="男性と作業" data-adm-img="1" style=""></div>
+      <div class="marquee-item"><img src="/assets/39df8d88230d.jpg" alt="持ち運び2" data-adm-img="1" style=""></div>
+      <!-- シームレスループ用複製 -->
+      <div class="marquee-item" aria-hidden="true"><img src="/assets/533c343399b3.jpg" alt="" data-adm-img="1" style=""></div>
+      <div class="marquee-item" aria-hidden="true"><img src="/assets/886e13de796b.jpg" alt="" data-adm-img="1" style=""></div>
+      <div class="marquee-item" aria-hidden="true"><img src="/assets/a6a70ddf6e97.jpg" alt="" data-adm-img="1" style=""></div>
+      <div class="marquee-item" aria-hidden="true"><img src="/assets/2b85dfcab0f8.jpg" alt="" data-adm-img="1" style=""></div>
+      <div class="marquee-item" aria-hidden="true"><img src="/assets/8a329f3b395f.jpg" alt="" data-adm-img="1" style=""></div>
+      <div class="marquee-item" aria-hidden="true"><img src="/assets/558d1aa830e0.jpg" alt="" data-adm-img="1" style=""></div>
+      <div class="marquee-item" aria-hidden="true"><img src="/assets/ce3ae1210c3f.jpg" alt="" data-adm-img="1" style=""></div>
+      <div class="marquee-item" aria-hidden="true"><img src="/assets/9436be44e856.jpg" alt="" data-adm-img="1" style=""></div>
+      <div class="marquee-item" aria-hidden="true"><img src="/assets/67fb6d13ca20.jpg" alt="" data-adm-img="1" style=""></div>
+      <div class="marquee-item" aria-hidden="true"><img src="/assets/b4599b263f9b.jpg" alt="" data-adm-img="1" style=""></div>
+      <div class="marquee-item" aria-hidden="true"><img src="/assets/39df8d88230d.jpg" alt="" data-adm-img="1" style=""></div>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- GALLERY ────────────────────────────────────── -->
+<section>
+  <div class="gallery-head">
+    <span class="g-label reveal visible" contenteditable="false">Gallery</span>
+    <h2 class="g-title reveal visible" contenteditable="false">生活に、自然に溶け込む。</h2>
+  </div>
+  <div class="gallery-grid">
+    <!-- 縦長：歩くモデル写真 -->
+    <div class="g-item photo tall reveal visible">
+      <img src="/assets/533c343399b3.jpg" alt="持ち運び" data-adm-img="1" style="">
+    </div>
+    <!-- 室内インテリア -->
+    <div class="g-item photo reveal visible" style="transition-delay:.06s">
+      <img src="/assets/2b85dfcab0f8.jpg" alt="キッチン" data-adm-img="1" style="">
+    </div>
+    <!-- 車内ワーク -->
+    <div class="g-item photo reveal visible" style="transition-delay:.10s">
+      <img src="/assets/a6a70ddf6e97.jpg" alt="車内" data-adm-img="1" style="">
+    </div>
+    <!-- 本棚シーン（超美しい） -->
+    <div class="g-item photo reveal visible" style="transition-delay:.08s">
+      <img src="/assets/ce3ae1210c3f.jpg" alt="本棚" data-adm-img="1" style="">
+    </div>
+    <!-- 公園ソーラー -->
+    <div class="g-item photo reveal visible" style="transition-delay:.16s">
+      <img src="/assets/886e13de796b.jpg" alt="公園でソーラー充電" data-adm-img="1" style="">
+    </div>
+    <!-- 複数デバイス充電（全幅） -->
+    <div class="g-item photo full reveal visible" style="transition-delay:.12s">
+      <img src="/assets/558d1aa830e0.jpg" alt="複数充電" data-adm-img="1" style="">
+    </div>
+  </div>
+</section>
+
+
+<!-- COVER DESIGN ───────────────────────────────── -->
+<!-- テキストを上に、3種のカバーを横並び3列でフルに見せる -->
+<section class="design-section">
+  <div class="wrap">
+    <div class="design-text reveal visible" style="padding-left:0; text-align:center; margin-bottom:0;">
+      <p class="d-eyebrow" contenteditable="false">Cover Design</p>
+      <h2 class="d-title" contenteditable="false">今日の気分で、<br>色を変えられる。</h2>
+      <p class="d-body" contenteditable="false">着せ替えシートに対応。9色のデザインから<br>お好みを選んで部屋のインテリアに合わせられます。</p>
+    </div>
+  </div>
+  <div class="dp-grid reveal visible" style="transition-delay:.1s">
+    <div class="dp-tile visible"><img src="/assets/ede5fd2823dc.jpg" alt="サンシャインイエロー" data-adm-img="1" style=""></div>
+    <div class="dp-tile visible"><img src="/assets/5ada1d9310fb.jpg" alt="エナジーオレンジ" data-adm-img="1" style=""></div>
+    <div class="dp-tile visible"><img src="/assets/df3d5c36f283.jpg" alt="ブロッサムピンク" data-adm-img="1" style=""></div>
+    <div class="dp-tile visible"><img src="/assets/0f8557f89b6f.jpg" alt="ホワイトマーブル" data-adm-img="1" style=""></div>
+    <div class="dp-tile visible"><img src="/assets/0e51d95c7716.jpg" alt="クラシックウッド" data-adm-img="1" style=""></div>
+    <div class="dp-tile visible"><img src="/assets/2d2647a58b0c.jpg" alt="ナチュラルウッド" data-adm-img="1" style=""></div>
+    <div class="dp-tile visible"><img src="/assets/ce74b809a772.jpg" alt="グレイマーブル" data-adm-img="1" style=""></div>
+    <div class="dp-tile visible"><img src="/assets/ebf2ca11f32a.jpg" alt="ヴィンテージウッド" data-adm-img="1" style=""></div>
+    <div class="dp-tile visible"><img src="/assets/3173ab636f8c.jpg" alt="ブラックマーブル" data-adm-img="1" style=""></div>
+  </div>
+</section>
+
+
+<!-- GIFT ───────────────────────────────────────── -->
+<!-- DSC00576：影が美しいトートバッグ。ブライトなオフホワイトパネルと対比 -->
+<div class="gift-section">
+  <div class="gift-panel">
+    <!-- head: スマホでは写真の上に来る -->
+    <div class="gift-panel-head">
+      <p class="gf-eyebrow reveal visible" contenteditable="false">期間限定特典</p>
+      <h2 class="gf-title reveal visible" contenteditable="false">オリジナルトートバッグ<div>プレゼント</div></h2>
+    </div>
+    <!-- body: スマホでは写真の下に来る -->
+    <div class="gift-panel-body">
+      <p class="gf-body reveal visible" contenteditable="false">
+        solarich 300 をご購入いただいたすべての方に、<br>
+        ソラリッチ オリジナルトートバッグを<br>
+        無料でお届けします。
+      </p>
+      <p class="gf-body reveal visible" style="margin-top:1em" contenteditable="false">
+        本体と一緒に持ち歩けば、<br>
+        毎日の外出がもっと身軽に。
+      </p>
+      <a href="https://solarich.co.jp/collections/portable-power-300" class="btn-primary reveal visible" style="align-self:flex-start; margin-bottom:20px; background:var(--sky);" contenteditable="false">今すぐ受け取る →</a>
+      <p class="gf-note reveal visible" contenteditable="false">先行販売 300台限定 — なくなり次第終了</p>
+    </div>
+  </div>
+  <!-- 2枚: ライフスタイル（上大）＋ クローズアップ（下小） -->
+  <div class="gift-photos">
+    <div class="gift-photo-main">
+      <img src="/assets/889a2e5b664d.jpg" alt="solarich 300 とトートバッグ" data-adm-img="1" style="">
+    </div>
+    <div class="gift-photo-sub">
+      <img src="/assets/0dbc0bdb982d.jpg" alt="オリジナルトートバッグ" data-adm-img="1" style="">
+    </div>
+  </div>
+</div>
+
+
+<!-- ATTACHMENTS ────────────────────────────────── -->
+<section class="att-section">
+  <div class="wrap">
+    <div class="att-head">
+      <p class="a-eyebrow reveal visible" contenteditable="false">Accessories</p>
+      <h2 class="a-title reveal visible" contenteditable="false">使い心地を高める<br>アタッチメント付属</h2>
+      <p class="a-desc reveal visible" contenteditable="false">追加購入なし。すぐに使えるアクセサリーがすべて同梱。</p>
+    </div>
+    <div class="att-grid">
+      <div class="att-item reveal visible">
+        <img src="/assets/fe88ef2e9cc8.jpg" alt="ソラリッチトレー" data-adm-img="1" style="">
+        <div class="att-name" contenteditable="false">ソラリッチトレー</div>
+        <div class="att-body" contenteditable="false"></div>
+      </div>
+      <div class="att-item reveal visible" style="transition-delay:.06s">
+        <img src="/assets/753ac3fe637a.jpg" alt="ケーブルセット" data-adm-img="1" style="">
+        <div class="att-name" contenteditable="false">ケーブルホルダー</div>
+        <div class="att-body" contenteditable="false"></div>
+      </div>
+      <div class="att-item reveal visible" style="transition-delay:.12s">
+        <img src="/assets/2ed83ff3f77d.jpg" alt="フラットケーブル" data-adm-img="1" style="">
+        <div class="att-name" contenteditable="false">ケーブルフック</div>
+        <div class="att-body" contenteditable="false"></div>
+      </div>
+      <div class="att-item reveal visible" style="transition-delay:.18s">
+        <img src="/assets/b2de09d34384.jpg" alt="キャスター" data-adm-img="1" style="">
+        <div class="att-name" contenteditable="false">らくらくキャスター × 4</div>
+        <div class="att-body" contenteditable="false"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- SOLAR SETS ─────────────────────────────────── -->
+<section class="solar-section">
+  <div class="wrap">
+    <div class="solar-head">
+      <p class="ss-eyebrow reveal visible" contenteditable="false">Solar Sets</p>
+      <h2 class="ss-title reveal visible" contenteditable="false">ソーラーパネルと合わせて、<div>どこでも電力を。</div></h2>
+      <p class="ss-body reveal visible" contenteditable="false">コンセントのない場所でも太陽光から直接充電。アウトドア・車中泊・防災備蓄に。</p>
+    </div>
+    <div class="solar-grid">
+      <div class="solar-card reveal visible">
+        <div class="solar-img">
+          <img src="/assets/608cd84b252f.jpg" alt="40Wセット" data-adm-img="1" style="">
+        </div>
+        <div class="solar-info">
+          <div class="s-name" contenteditable="false">ソーラーパネル 40W セット</div>
+          <div class="s-text" contenteditable="false">リュックに入るコンパクトな40Wパネル。USB-A/USB-C出力付き。本体なしでもスマホを直接充電可能。</div>
+          <div class="s-price" contenteditable="false">¥59,800<span class="s-tax">（税込）</span></div>
+        </div>
+      </div>
+      <div class="solar-card reveal visible" style="transition-delay:.1s">
+        <div class="solar-img">
+          <img src="/assets/f1c484db20bc.jpg" alt="100Wセット" data-adm-img="1" style="">
+        </div>
+        <div class="solar-info">
+          <div class="s-name" contenteditable="false">ソーラーパネル 100W セット</div>
+          <div class="s-text" contenteditable="false">高出力100Wで本格充電。防災備蓄・キャンプ・車中泊など、上位モデルをお求めの方に。</div>
+          <div class="s-price" contenteditable="false">¥69,800<span class="s-tax">（税込）</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- VIDEO ──────────────────────────────────────── -->
+<section class="video-section">
+  <div class="wrap">
+    <div class="v-head reveal visible">
+      <p class="v-eyebrow" contenteditable="false">Movie</p>
+      <h2 class="v-title" contenteditable="false">さあ、一緒に出かけよう。</h2>
+    </div>
+    <div class="video-wrap reveal visible" style="transition-delay:.1s">
+      <video id="promo-video" controls="" muted="" playsinline="" preload="metadata" poster="./デザイン｜共有/★ 写真動画素材/★製品写真/撮影｜納品日別/26.0115｜キャナル/300W/使用候補/DSC00568.JPG">
+        <source src="/assets/698ba1f70139.mp4" type="video/mp4">
+      </video>
+    </div>
+  </div>
+</section>
+
+
+<!-- PACKAGE ────────────────────────────────────── -->
+<!-- 白抜き：padding除去、白背景でカットアウト画像を自然に表示 -->
+<div class="pkg">
+  <div class="pkg-photo">
+    <img src="/assets/63a412116c36.jpg" alt="パッケージ" data-adm-img="1" style="">
+  </div>
+  <div class="pkg-text">
+    <!-- head: スマホでは写真の上 -->
+    <div class="pkg-text-head">
+      <p class="pk-eyebrow reveal visible" contenteditable="false">Packaging</p>
+      <h2 class="pk-title reveal visible" contenteditable="false">開けた瞬間から、<br>ワクワクするパッケージ。</h2>
+    </div>
+    <!-- body: スマホでは写真の下 -->
+    <div class="pkg-text-body">
+      <p class="pk-body reveal visible" contenteditable="false">
+        「きっと、毎日使いたくなる」——<br>
+        ソラリッチのブランドコンセプトを体現した、<br>
+        丁寧で美しい梱包でお届けします。
+      </p>
+      <p class="pk-body reveal visible" style="margin-top:1em" contenteditable="false">
+        プレゼントにもぴったりの一台です。
+      </p>
+    </div>
+  </div>
+</div>
+
+
+<!-- SET CONTENTS ───────────────────────────────── -->
+<section class="contents-section">
+  <div class="wrap">
+    <div class="cnt-head">
+      <p class="cnt-eyebrow reveal visible" contenteditable="false">What's in the box</p>
+      <h2 class="cnt-title reveal visible" contenteditable="false">セット内容</h2>
+    </div>
+    <ul class="contents-list reveal visible">
+      <li contenteditable="false" class="">ソラリッチ 300 本体</li>
+      <li contenteditable="false" class="">ソラリッチトレー</li>
+      <li contenteditable="false" class="">AC 充電ケーブル</li>
+      <li contenteditable="false" class="">シガーアダプター</li>
+      <li contenteditable="false" class="">ケーブルホルダー × 1</li>
+      <li contenteditable="false" class="">ケーブルフック × 1</li>
+      <li contenteditable="false" class="">ケーブルバンド × 3</li>
+      <li contenteditable="false" class="">らくらくキャスター × 4</li>
+      <li contenteditable="false" class="">専用オリジナルバッグ</li>
+      <li contenteditable="false" class="">スタートガイド</li>
+      <li contenteditable="false" class="">取扱説明書</li>
+    </ul>
+  </div>
+</section>
+
+
+<!-- SPECS ──────────────────────────────────────── -->
+<section class="specs-section">
+  <div class="wrap">
+    <div class="sp-head">
+      <p class="sp-eyebrow reveal visible" contenteditable="false">Specifications</p>
+      <h2 class="sp-title reveal visible" contenteditable="false">スペック詳細</h2>
+    </div>
+    <div class="specs-inner">
+      <div class="spec-group">
+        <details open="">
+          <summary>基本情報</summary>
+          <table class="spec-table">
+            <tbody><tr><td>重量</td><td>3.6 kg</td></tr>
+            <tr><td>サイズ</td><td>248 mm × 158 mm × 152 mm</td></tr>
+            <tr><td>バッテリー容量</td><td>204 Wh</td></tr>
+            <tr><td>Wi-Fi</td><td>対応（専用アプリでスマホ連携）</td></tr>
+          </tbody></table>
+        </details>
+      </div>
+      <div class="spec-group">
+        <details>
+          <summary>入力（充電）スペック</summary>
+          <table class="spec-table">
+            <tbody><tr><td>AC 入力</td><td>100〜120 V、50/60 Hz、最大 5.5 A、最大 250 W</td></tr>
+            <tr><td>ソーラーパネル入力</td><td>DC 12〜24 V、最大 8 A、最大 120 W</td></tr>
+            <tr><td>シガーソケット入力</td><td>12 V 車両対応、最大 8 A、最大 96 W</td></tr>
+          </tbody></table>
+        </details>
+      </div>
+      <div class="spec-group">
+        <details>
+          <summary>出力スペック</summary>
+          <table class="spec-table">
+            <tbody><tr><td>AC 出力</td><td>100〜120 V、50/60 Hz、定格 300 W ／ 瞬間最大 500 W</td></tr>
+            <tr><td>シガーソケット出力</td><td>DC 12.6 V、最大 8 A、最大 100 W</td></tr>
+            <tr><td>USB-C1 / C2</td><td>各最大 65 W PD（5/9/12/15 V = 3 A、20 V = 3.25 A）</td></tr>
+            <tr><td>USB-A1 / A2</td><td>DC 5 V = 2.4 A（各最大 12 W）</td></tr>
+          </tbody></table>
+        </details>
+      </div>
+      <div class="spec-group">
+        <details>
+          <summary>バッテリー性能</summary>
+          <table class="spec-table">
+            <tbody><tr><td>セル種類</td><td>リン酸鉄リチウムイオン（LiFePO₄）</td></tr>
+            <tr><td>サイクル寿命</td><td>充放電 4,000 回（初期比 70% まで）</td></tr>
+            <tr><td>推奨充電温度</td><td>0℃〜30℃</td></tr>
+            <tr><td>推奨放電温度</td><td>−20℃〜30℃</td></tr>
+            <tr><td>保管温度</td><td>0℃〜45℃（長期保存は 20℃〜30℃ 推奨）</td></tr>
+          </tbody></table>
+        </details>
+      </div>
+      <div class="spec-group">
+        <details>
+          <summary>認証・安全性</summary>
+          <table class="spec-table">
+            <tbody><tr><td>認証</td><td>PSE マーク取得済み（電気用品安全法適合）</td></tr>
+          </tbody></table>
+        </details>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- CTA ────────────────────────────────────────── -->
+<div class="cta-section">
+  <img class="cta-bg" src="/assets/533c343399b3.jpg" alt="" data-adm-img="1" style="">
+  <div class="cta-content reveal visible">
+    <p class="cta-eyebrow" contenteditable="false">300台限定 先行販売</p>
+    <h2 class="cta-title" contenteditable="false">solarich 300 を<br>手に入れる</h2>
+    <p class="cta-sub" contenteditable="false">送料無料・30日間返品保証・3年メーカー保証</p>
+    <a href="https://solarich.co.jp/collections/portable-power-300" class="btn-white" contenteditable="false">¥39,800（税込）で購入する</a>
+    <p class="cta-note" contenteditable="false">オリジナルトートバッグ プレゼント中</p>
+  </div>
+</div>
+
+
+<!-- FOOTER ─────────────────────────────────────── -->
+<footer>
+  <div class="footer-logo">
+    <img src="/assets/83c79bf929b4.png" alt="solarich" data-adm-img="1" style="">
+  </div>
+  <p>
+    <a href="https://solarich.co.jp/policies/privacy-policy">プライバシーポリシー</a>
+    <a href="https://solarich.co.jp/policies/terms-of-service">利用規約</a>
+    <a href="https://solarich.co.jp/policies/refund-policy">返品ポリシー</a>
+  </p>
+  <p>© 2026 ソラリッチ株式会社</p>
+</footer>
+
+
+<script>
+  function closeIntro() {
+    const el = document.getElementById('intro');
+    el.classList.add('fade-out');
+    setTimeout(() => el.remove(), 1200);
+  }
+  setTimeout(closeIntro, 3000);  /* ロゴのみなので短縮 */
+
+  /* ── Reveal（全バリアント統合）── */
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale').forEach(el => obs.observe(el));
+
+  /* ── dp-tile スタッガー ── */
+  const tileObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); tileObs.unobserve(e.target); }
+    });
+  }, { threshold: 0.05 });
+  document.querySelectorAll('.dp-tile').forEach(el => tileObs.observe(el));
+
+  /* ── カウントアップ ── */
+  function countUp(el, to, decimals, suffix, duration) {
+    const start = performance.now();
+    const from = 0;
+    function step(now) {
+      const p = Math.min((now - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - p, 3); /* easeOutCubic */
+      const val = from + (to - from) * ease;
+      el.textContent = decimals ? val.toFixed(decimals) : Math.round(val).toLocaleString();
+      if (p < 1) requestAnimationFrame(step);
+      else el.textContent = (decimals ? to.toFixed(decimals) : to.toLocaleString()) + suffix;
+    }
+    requestAnimationFrame(step);
+  }
+
+  const countObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const el = e.target;
+      const to = parseFloat(el.dataset.to);
+      const dec = parseInt(el.dataset.dec || 0);
+      const suf = el.dataset.suf || '';
+      countUp(el, to, dec, suf, 1400);
+      countObs.unobserve(el);
+    });
+  }, { threshold: 0.5 });
+  document.querySelectorAll('[data-to]').forEach(el => countObs.observe(el));
+
+  /* ── ボタンリップル ── */
+  const rippleCSS = document.createElement('style');
+  rippleCSS.textContent = `.ripple-wave{position:absolute;border-radius:50%;background:rgba(255,255,255,.35);transform:scale(0);animation:rippleAnim .55s ease-out forwards;pointer-events:none}@keyframes rippleAnim{to{transform:scale(4);opacity:0}}`;
+  document.head.appendChild(rippleCSS);
+  document.querySelectorAll('.btn-primary, .btn-white').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      const r = document.createElement('span');
+      const rect = btn.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      r.className = 'ripple-wave';
+      r.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px`;
+      btn.appendChild(r);
+      setTimeout(() => r.remove(), 600);
+    });
+  });
+
+  /* ── 動画スクロール自動再生 ── */
+  (function() {
+    var vid = document.getElementById('promo-video');
+    if (!vid) return;
+    var vio = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) {
+        if (e.isIntersecting) {
+          vid.play().catch(function(){});
+        } else {
+          vid.pause();
+        }
+      });
+    }, { threshold: 0.4 });
+    vio.observe(vid);
+  })();
+</script>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     ADMIN PANEL  —  LOCAL ONLY  (file:// / localhost)
+     サーバーにアップすると自動で非表示になります。
+════════════════════════════════════════════════════════ -->
+<style>
+/* ─── admin: scope reset ──────────────────────────────── */
+#adm-tb *, #adm *, #adm-img-cover {
+  box-sizing: border-box; margin: 0; padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans JP', sans-serif;
+}
+
+/* ═══ EDITING TOOLBAR ═══════════════════════════════════ */
+#adm-tb {
+  position: fixed; top: 0; left: 0; right: 0; height: 52px;
+  z-index: 9100; background: #fff;
+  border-bottom: 1.5px solid #e8e6e2;
+  box-shadow: 0 2px 12px rgba(0,0,0,.07);
+  display: none; align-items: center;
+  padding: 0 14px; gap: 3px;
+  overflow-x: auto;
+}
+#adm-tb.on { display: flex; }
+#adm-tb::-webkit-scrollbar { display: none; }
+
+.tb-g { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
+.tb-sep { width: 1px; height: 24px; background: #e8e6e2; margin: 0 6px; flex-shrink: 0; }
+
+/* buttons */
+.tb-b {
+  min-width: 32px; height: 32px; padding: 0 7px;
+  border: none; background: none; border-radius: 5px;
+  cursor: pointer; font-size: 13px; color: #444;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .12s; flex-shrink: 0; gap: 4px;
+  white-space: nowrap;
+}
+.tb-b:hover { background: #f0f0f0; }
+.tb-b.on { background: #E5F5FC; color: #0C3B52; }
+.tb-b svg { pointer-events: none; display: block; }
+
+/* font size */
+#tb-sz {
+  width: 42px; height: 30px; border: 1px solid #e0dedb;
+  border-radius: 4px; text-align: center; font-size: 13px;
+  color: #333; outline: none; -moz-appearance: textfield; appearance: textfield;
+}
+#tb-sz::-webkit-inner-spin-button,#tb-sz::-webkit-outer-spin-button { display: none; }
+#tb-sz:focus { border-color: #56C2EC; }
+
+/* text color swatch */
+.tb-col-btn {
+  position: relative; width: 32px; height: 32px; border-radius: 5px;
+  border: none; background: none; cursor: pointer; padding: 0;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 2px; transition: background .12s;
+  flex-shrink: 0;
+}
+.tb-col-btn:hover { background: #f0f0f0; }
+.tb-col-a { font-size: 14px; font-weight: 700; color: #333; line-height: 1; }
+.tb-col-bar { width: 18px; height: 3px; border-radius: 2px; }
+.tb-col-inp {
+  position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer;
+}
+
+/* sliders */
+.tb-slider-g { display: flex; align-items: center; gap: 7px; flex-shrink: 0; }
+.tb-lbl { font-size: 11px; color: #aaa; white-space: nowrap; }
+.tb-range {
+  width: 76px; height: 4px; -webkit-appearance: none; appearance: none;
+  background: #e0dedb; border-radius: 2px; outline: none; cursor: pointer;
+}
+.tb-range::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%;
+  background: #56C2EC; cursor: pointer; box-shadow: 0 1px 5px rgba(86,194,236,.4);
+}
+.tb-range::-moz-range-thumb {
+  width: 14px; height: 14px; border-radius: 50%; background: #56C2EC; border: none;
+}
+.tb-val { font-size: 11px; color: #666; min-width: 36px; font-family: monospace; }
+
+/* weight select */
+#tb-wt {
+  height: 30px; border: 1px solid #e0dedb; border-radius: 4px;
+  font-size: 12px; color: #333; outline: none; padding: 0 6px; cursor: pointer;
+}
+#tb-wt:focus { border-color: #56C2EC; }
+
+/* reset / done */
+#tb-rst {
+  height: 28px; padding: 0 10px; background: none;
+  border: 1px solid #e0dedb; border-radius: 4px;
+  font-size: 11px; color: #aaa; cursor: pointer; flex-shrink: 0;
+  transition: border-color .15s, color .15s;
+}
+#tb-rst:hover { border-color: #56C2EC; color: #56C2EC; }
+#tb-done {
+  height: 32px; padding: 0 16px; background: #0C3B52; color: #fff;
+  border: none; border-radius: 5px; font-size: 12px; font-weight: 700;
+  cursor: pointer; flex-shrink: 0; transition: opacity .15s; letter-spacing: .04em;
+}
+#tb-done:hover { opacity: .8; }
+#tb-hint { font-size: 12px; color: #ccc; white-space: nowrap; flex-shrink: 0; margin-right: 4px; }
+
+/* ═══ IMAGE REPLACE OVERLAY ══════════════════════════════ */
+#adm-img-cover {
+  position: fixed; z-index: 9050; display: flex; align-items: center;
+  justify-content: center; cursor: pointer;
+  background: rgba(86,194,236,.18); border: 2px solid #56C2EC;
+  transition: background .15s; pointer-events: auto;
+}
+#adm-img-cover:hover { background: rgba(86,194,236,.35); }
+#adm-img-cover span {
+  background: #56C2EC; color: #0C3B52; font-size: 12px; font-weight: 700;
+  padding: 7px 18px; border-radius: 20px; letter-spacing: .04em; pointer-events: none;
+}
+
+/* ═══ TRIGGER + PANEL ═══════════════════════════════════ */
+#adm-trigger {
+  position: fixed; bottom: 28px; right: 28px; z-index: 8800;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: var(--sky); color: #fff; border: none;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 20px rgba(86,194,236,.5);
+  transition: transform .2s, box-shadow .2s;
+}
+#adm-trigger:hover { transform: scale(1.1); box-shadow: 0 6px 32px rgba(86,194,236,.7); }
+#adm-trigger svg { pointer-events: none; }
+
+/* (toolbar replaces the old bar) */
+
+/* ─── サイドパネル ─────────────────────────────────────── */
+#adm-panel {
+  position: fixed; top: 0; right: -320px; width: 320px; height: 100dvh;
+  z-index: 8900; background: #fff;
+  box-shadow: -6px 0 40px rgba(0,0,0,.13);
+  transition: right .3s cubic-bezier(.4,0,.2,1), width .25s ease;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+#adm-panel.open { right: 0; }
+#adm-panel.mini { width: 36px; }
+#adm-panel.mini #adm-scroll,
+#adm-panel.mini #adm-head-title,
+#adm-panel.mini #adm-x { display: none; }
+#adm-mini-btn {
+  background: none; border: none; color: #bbb; font-size: 16px;
+  cursor: pointer; width: 28px; height: 28px; border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .15s, color .15s; flex-shrink: 0;
+}
+#adm-mini-btn:hover { background: #f5f4f0; color: var(--deep); }
+#adm-panel.mini #adm-mini-btn { color: var(--sky); width: 36px; }
+#adm-mini-handle {
+  display: none; flex-direction: column; align-items: center;
+  justify-content: center; height: 100dvh; cursor: pointer; gap: 6px;
+}
+#adm-panel.mini #adm-mini-handle { display: flex; }
+#adm-mini-handle span { width: 3px; height: 3px; background: var(--sky); border-radius: 50%; }
+
+#adm-head {
+  padding: 18px 20px 15px; flex-shrink: 0;
+  border-bottom: 1px solid #f0eeea;
+  display: flex; align-items: center; justify-content: space-between;
+}
+#adm-head-title { font-size: 15px; font-weight: 700; color: var(--deep); }
+#adm-head-title em { font-style: normal; color: var(--sky); }
+#adm-x {
+  background: none; border: none; color: #bbb; font-size: 20px;
+  cursor: pointer; width: 28px; height: 28px; border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .15s, color .15s;
+}
+#adm-x:hover { background: #f5f4f0; color: #555; }
+
+#adm-scroll { flex: 1; overflow-y: auto; padding-bottom: 32px; }
+#adm-scroll::-webkit-scrollbar { width: 4px; }
+#adm-scroll::-webkit-scrollbar-track { background: transparent; }
+#adm-scroll::-webkit-scrollbar-thumb { background: #e0dedb; border-radius: 4px; }
+
+.adm-sec { padding: 20px; border-bottom: 1px solid #f5f4f0; }
+.adm-sec:last-child { border-bottom: none; }
+.adm-sec-lbl {
+  font-size: 9px; letter-spacing: .14em; text-transform: uppercase;
+  color: #bbb; font-weight: 700; margin-bottom: 14px;
+}
+.adm-hint { font-size: 11px; color: #bbb; line-height: 1.75; margin-top: 10px; }
+
+/* toggle */
+.adm-tog-row {
+  display: flex; align-items: center; gap: 10px; cursor: pointer;
+  user-select: none;
+}
+.adm-tog { position: relative; width: 38px; height: 22px; flex-shrink: 0; }
+.adm-tog input { opacity: 0; width: 0; height: 0; position: absolute; }
+.adm-track {
+  position: absolute; inset: 0; background: #ddd; border-radius: 22px;
+  transition: background .2s;
+}
+.adm-track::before {
+  content: ''; position: absolute; top: 3px; left: 3px;
+  width: 16px; height: 16px; background: #fff; border-radius: 50%;
+  transition: transform .2s; box-shadow: 0 1px 4px rgba(0,0,0,.2);
+}
+.adm-tog input:checked ~ .adm-track { background: var(--sky); }
+.adm-tog input:checked ~ .adm-track::before { transform: translateX(16px); }
+.adm-tog-label { font-size: 14px; font-weight: 500; color: #333; }
+
+/* color rows */
+.adm-col-row {
+  display: flex; align-items: center; gap: 9px; padding: 9px 0;
+  border-bottom: 1px solid #faf9f7;
+}
+.adm-col-row:last-of-type { border-bottom: none; margin-bottom: 8px; }
+.adm-dot { width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0; border: 1.5px solid rgba(0,0,0,.08); }
+.adm-col-lbl { font-size: 12px; color: #555; flex: 1; }
+.adm-col-swatch {
+  -webkit-appearance: none; appearance: none;
+  width: 30px; height: 30px; border: none; cursor: pointer;
+  background: none; padding: 0; border-radius: 4px; overflow: hidden;
+}
+.adm-col-swatch::-webkit-color-swatch-wrapper { padding: 0; }
+.adm-col-swatch::-webkit-color-swatch { border: none; border-radius: 4px; }
+.adm-hex { font-size: 11px; color: #bbb; font-family: 'SF Mono', 'Fira Mono', monospace; width: 64px; text-align: right; }
+
+/* buttons */
+.adm-btn-primary {
+  width: 100%; padding: 13px; background: var(--sky); color: var(--deep);
+  border: none; font-size: 13px; font-weight: 700; cursor: pointer;
+  border-radius: 6px; letter-spacing: .04em; transition: filter .2s;
+}
+.adm-btn-primary:hover { filter: brightness(1.08); }
+.adm-btn-save {
+  width: 100%; padding: 14px; background: var(--deep); color: #fff;
+  border: none; font-size: 13px; font-weight: 700; cursor: pointer;
+  border-radius: 6px; letter-spacing: .04em; transition: background .2s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin-bottom: 6px;
+}
+.adm-btn-save:hover { background: #0A3049; }
+.adm-btn-save.saved { background: #1a7a4a; }
+.adm-btn-save.saving { opacity: .7; cursor: wait; }
+.adm-btn-ghost {
+  width: 100%; padding: 10px; background: none; color: #aaa;
+  border: 1px solid #eee; font-size: 12px; cursor: pointer;
+  border-radius: 6px; margin-top: 12px; letter-spacing: .03em;
+  transition: border-color .2s, color .2s;
+}
+.adm-btn-ghost:hover { border-color: var(--sky); color: var(--sky); }
+
+/* edit-mode highlights */
+body.adm-editing .adm-editable {
+  outline: 1.5px dashed rgba(86,194,236,.4);
+  border-radius: 2px; cursor: text; min-height: 1em;
+}
+body.adm-editing .adm-editable:hover {
+  outline: 2px solid #56C2EC;
+  background: rgba(86,194,236,.05) !important;
+}
+body.adm-editing .adm-editable.adm-focused,
+body.adm-editing .adm-editable:focus {
+  outline: 2px solid #56C2EC;
+  background: rgba(86,194,236,.09) !important;
+  box-shadow: 0 0 0 4px rgba(86,194,236,.12);
+}
+</style>
+
+<!-- ── EDITING TOOLBAR ───────────────────────────────────── -->
+<div id="adm-tb" class="">
+  <span id="tb-hint" style="display: none;">▸ テキストをクリックして選択</span>
+
+  <!-- font size -->
+  <div class="tb-g">
+    <button class="tb-b" id="tb-sz-d" title="小さく">
+      <svg width="16" height="14" viewBox="0 0 16 14" fill="currentColor">
+        <text x="0" y="11" font-size="12" font-family="sans-serif">A</text>
+        <text x="10" y="13" font-size="10" font-family="sans-serif">−</text>
+      </svg>
+    </button>
+    <input id="tb-sz" type="number" min="8" max="200" value="16" title="フォントサイズ px">
+    <button class="tb-b" id="tb-sz-u" title="大きく">
+      <svg width="16" height="14" viewBox="0 0 16 14" fill="currentColor">
+        <text x="0" y="13" font-size="14" font-family="sans-serif">A</text>
+        <text x="12" y="9" font-size="9" font-family="sans-serif">+</text>
+      </svg>
+    </button>
+  </div>
+
+  <!-- font weight -->
+  <select id="tb-wt" title="ウェイト">
+    <option value="100">100 Thin</option>
+    <option value="300">300 Light</option>
+    <option value="400" selected="">400 Normal</option>
+    <option value="500">500 Medium</option>
+    <option value="700">700 Bold</option>
+    <option value="900">900 Black</option>
+  </select>
+
+  <div class="tb-sep"></div>
+
+  <!-- style toggles -->
+  <div class="tb-g">
+    <button class="tb-b" id="tb-it" title="斜体 (I)">
+      <svg width="10" height="14" viewBox="0 0 10 14" fill="currentColor">
+        <text x="1" y="12" font-size="14" font-style="italic" font-family="serif">I</text>
+      </svg>
+    </button>
+    <button class="tb-b" id="tb-ul" title="下線 (U)">
+      <svg width="13" height="16" viewBox="0 0 13 16" fill="currentColor">
+        <text x="0" y="11" font-size="12" font-family="sans-serif">U</text>
+        <rect x="0" y="13" width="13" height="2" rx="1"></rect>
+      </svg>
+    </button>
+    <button class="tb-b" id="tb-st" title="取り消し線">
+      <svg width="13" height="14" viewBox="0 0 13 14" fill="currentColor">
+        <text x="0" y="12" font-size="12" font-family="sans-serif">S</text>
+        <rect x="0" y="6" width="13" height="2" rx="1"></rect>
+      </svg>
+    </button>
+  </div>
+
+  <div class="tb-sep"></div>
+
+  <!-- text color -->
+  <label class="tb-col-btn" title="テキストカラー">
+    <span class="tb-col-a">A</span>
+    <span class="tb-col-bar" id="tb-col-bar" style="background: rgb(13, 13, 13);"></span>
+    <input class="tb-col-inp" type="color" id="tb-col" value="#0d0d0d">
+  </label>
+
+  <div class="tb-sep"></div>
+
+  <!-- alignment -->
+  <div class="tb-g">
+    <button class="tb-b on" id="tb-al-l" title="左揃え">
+      <svg width="15" height="12" viewBox="0 0 15 12" fill="currentColor">
+        <rect x="0" y="0" width="15" height="2" rx="1"></rect><rect x="0" y="5" width="10" height="2" rx="1"></rect><rect x="0" y="10" width="13" height="2" rx="1"></rect>
+      </svg>
+    </button>
+    <button class="tb-b" id="tb-al-c" title="中央揃え">
+      <svg width="15" height="12" viewBox="0 0 15 12" fill="currentColor">
+        <rect x="0" y="0" width="15" height="2" rx="1"></rect><rect x="2.5" y="5" width="10" height="2" rx="1"></rect><rect x="1" y="10" width="13" height="2" rx="1"></rect>
+      </svg>
+    </button>
+    <button class="tb-b" id="tb-al-r" title="右揃え">
+      <svg width="15" height="12" viewBox="0 0 15 12" fill="currentColor">
+        <rect x="0" y="0" width="15" height="2" rx="1"></rect><rect x="5" y="5" width="10" height="2" rx="1"></rect><rect x="2" y="10" width="13" height="2" rx="1"></rect>
+      </svg>
+    </button>
+  </div>
+
+  <div class="tb-sep"></div>
+
+  <!-- line height -->
+  <div class="tb-g tb-slider-g">
+    <span class="tb-lbl">行間</span>
+    <input class="tb-range" type="range" id="tb-lh" min="1" max="3.5" step="0.05" value="1.8">
+    <span class="tb-val" id="tb-lh-v">1.3</span>
+  </div>
+
+  <div class="tb-sep"></div>
+
+  <!-- letter spacing -->
+  <div class="tb-g tb-slider-g">
+    <span class="tb-lbl">字間</span>
+    <input class="tb-range" type="range" id="tb-ls" min="-0.05" max="0.5" step="0.01" value="0">
+    <span class="tb-val" id="tb-ls-v">-0.01em</span>
+  </div>
+
+  <div class="tb-sep"></div>
+
+  <button id="tb-rst" title="スタイルをリセット">↺ リセット</button>
+
+  <div class="tb-sep"></div>
+
+  <button class="tb-b" id="tb-bulk" title="同じ種類のテキストにも一括適用">⇉ 一括</button>
+
+  <div style="flex:1;min-width:8px"></div>
+  <button id="tb-done">完了</button>
+</div>
+
+<!-- image replace overlay -->
+<div id="adm-img-cover" style="display: none; top: 122.375px; left: 0px; width: 572px; height: 512.562px;"><span>📷 クリックして変更</span></div>
+
+<!-- ── SIDE PANEL + TRIGGER ──────────────────────────────── -->
+<div id="adm" style="display: none;">
+  <button id="adm-trigger" title="管理画面">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+    </svg>
+  </button>
+
+  <div id="adm-panel" class="open">
+    <div id="adm-head">
+      <span id="adm-head-title">solarich <em>editor</em></span>
+      <button id="adm-mini-btn" title="折りたたむ">◀</button>
+      <button id="adm-x">✕</button>
+    </div>
+    <div id="adm-mini-handle" title="展開する">
+      <span></span><span></span><span></span>
+    </div>
+    <div id="adm-scroll">
+
+      <!-- 編集モード -->
+      <div class="adm-sec">
+        <div class="adm-sec-lbl">テキスト・画像編集</div>
+        <label class="adm-tog-row">
+          <div class="adm-tog">
+            <input type="checkbox" id="adm-edit-cb">
+            <span class="adm-track"></span>
+          </div>
+          <span class="adm-tog-label">編集モード</span>
+        </label>
+        <p class="adm-hint">テキストをクリックして書き換え＆上部ツールバーで書式変更。画像にホバーすると差し替えボタンが出ます。Esc で終了。</p>
+      </div>
+
+      <!-- ブランドカラー -->
+      <div class="adm-sec">
+        <div class="adm-sec-lbl">ブランドカラー</div>
+        <div class="adm-col-row">
+          <span class="adm-dot" id="adm-dot-sky" style="background: rgb(86, 194, 236);"></span>
+          <span class="adm-col-lbl">ソラブルー</span>
+          <input class="adm-col-swatch" type="color" id="adm-col-sky" value="#56C2EC">
+          <span class="adm-hex" id="adm-hex-sky">#56C2EC</span>
+        </div>
+        <div class="adm-col-row">
+          <span class="adm-dot" id="adm-dot-deep" style="background: rgb(12, 59, 82);"></span>
+          <span class="adm-col-lbl">深空ネイビー</span>
+          <input class="adm-col-swatch" type="color" id="adm-col-deep" value="#0C3B52">
+          <span class="adm-hex" id="adm-hex-deep">#0C3B52</span>
+        </div>
+        <div class="adm-col-row">
+          <span class="adm-dot" id="adm-dot-off" style="background: rgb(245, 244, 240);"></span>
+          <span class="adm-col-lbl">背景オフホワイト</span>
+          <input class="adm-col-swatch" type="color" id="adm-col-off" value="#F5F4F0">
+          <span class="adm-hex" id="adm-hex-off">#F5F4F0</span>
+        </div>
+        <div class="adm-col-row">
+          <span class="adm-dot" id="adm-dot-ink" style="background: rgb(13, 13, 13);"></span>
+          <span class="adm-col-lbl">本文テキスト</span>
+          <input class="adm-col-swatch" type="color" id="adm-col-ink" value="#0D0D0D">
+          <span class="adm-hex" id="adm-hex-ink">#0D0D0D</span>
+        </div>
+        <button class="adm-btn-ghost" id="adm-reset">↺ デフォルトに戻す</button>
+      </div>
+
+      <!-- 書き出し -->
+      <div class="adm-sec">
+        <div class="adm-sec-lbl">保存・書き出し</div>
+        <button class="adm-btn-save saving" id="adm-save">
+          <span id="adm-save-icon">💾</span>
+          <span id="adm-save-label">保存中…</span>
+        </button>
+        <p class="adm-hint" style="margin-bottom:10px">初回のみ Dropbox 内の <strong>solarich300.html</strong> を選択して上書き。以降は <strong>⌘S</strong> で即保存。</p>
+        <button class="adm-btn-ghost" id="adm-dl">↓ ダウンロード（別名保存）</button>
+        <p class="adm-hint">サーバーにアップすると管理画面は自動で非表示になります。</p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ══ LOCAL CHECK ═══════════════════════════════════════ */
+  var isLocal = location.protocol === 'file:' ||
+    ['localhost','127.0.0.1',''].indexOf(location.hostname) !== -1;
+  if (!isLocal) return;
+
+  /* ══ ELEMENTS ══════════════════════════════════════════ */
+  var adm      = document.getElementById('adm');
+  var tb       = document.getElementById('adm-tb');
+  var panel    = document.getElementById('adm-panel');
+  var trigger  = document.getElementById('adm-trigger');
+  var xBtn     = document.getElementById('adm-x');
+  var editCb   = document.getElementById('adm-edit-cb');
+  var imgCover = document.getElementById('adm-img-cover');
+
+  adm.style.display = 'block';
+
+  /* ══ PANEL OPEN / CLOSE ════════════════════════════════ */
+  trigger.addEventListener('click', function () { panel.classList.toggle('open'); panel.classList.remove('mini'); });
+  xBtn.addEventListener('click',    function () { panel.classList.remove('open'); });
+
+  var miniBtn    = document.getElementById('adm-mini-btn');
+  var miniHandle = document.getElementById('adm-mini-handle');
+  function toggleMini() { panel.classList.toggle('mini'); }
+  miniBtn.addEventListener('click', toggleMini);
+  miniHandle.addEventListener('click', toggleMini);
+
+  /* ══ EDITABLE SELECTORS ════════════════════════════════ */
+  var EDIT_SEL = [
+    'h1','h2','h3',
+    '.hero-eyebrow','.hero-limited','.hero-price','.hero-price-note','.hero-gift','.hero-desc',
+    '.carry-eyebrow','.carry-title','.carry-text','.carry-num','.carry-label',
+    '.st-label','.st-title','.st-body',
+    '.sn','.sl','.sd',
+    '.m-label','.m-title','.g-label','.g-title',
+    '.d-eyebrow','.d-title','.d-body',
+    '.gf-eyebrow','.gf-title','.gf-body','.gf-note',
+    '.a-eyebrow','.a-title','.a-desc','.att-name','.att-body',
+    '.ss-eyebrow','.ss-title','.ss-body',
+    '.s-name','.s-text','.s-price',
+    '.v-eyebrow','.v-title',
+    '.pk-eyebrow','.pk-title','.pk-body',
+    '.cnt-eyebrow','.cnt-title','.contents-list li',
+    '.sp-eyebrow','.sp-title',
+    '.cta-eyebrow','.cta-title','.cta-sub','.cta-note',
+    'a.btn-primary','a.btn-white'
+  ].join(',');
+
+  /* ══ BATCH MODE ════════════════════════════════════════ */
+  var batchMode = false;
+  var SKIP_CLASSES = {'reveal':1,'visible':1,'adm-editable':1,'adm-focused':1,'photo':1,'tall':1,'wide':1,'dp-card':1,'tb-b':1,'on':1};
+
+  document.getElementById('tb-bulk').addEventListener('mousedown', function(e){
+    e.preventDefault();
+    batchMode = !batchMode;
+    this.classList.toggle('on', batchMode);
+    this.textContent = batchMode ? '⇉ 一括 ON' : '⇉ 一括';
+  });
+
+  function getSiblings(el) {
+    var classes = Array.from(el.classList).filter(function(c){ return !SKIP_CLASSES[c]; });
+    var sel = classes.length
+      ? classes.map(function(c){ return '.'+c; }).join(',')
+      : el.tagName.toLowerCase();
+    return Array.from(document.querySelectorAll(sel)).filter(function(e){
+      return e !== el && !e.closest('#adm') && !e.closest('#adm-tb');
+    });
+  }
+
+  /* ══ FOCUSED ELEMENT ═══════════════════════════════════ */
+  var focusedEl = null;
+
+  function onElFocus(e) {
+    if (focusedEl) focusedEl.classList.remove('adm-focused');
+    focusedEl = e.currentTarget;
+    focusedEl.classList.add('adm-focused');
+    document.getElementById('tb-hint').style.display = 'none';
+    syncTb(focusedEl);
+  }
+
+  /* ══ EDIT MODE ════════════════════════════════════════= */
+  function setEditMode(on) {
+    var els = document.querySelectorAll(EDIT_SEL);
+    els.forEach(function (el) {
+      if (el.closest('#adm') || el.closest('#adm-tb')) return;
+      el.contentEditable = on ? 'true' : 'false';
+      el.classList.toggle('adm-editable', on);
+      if (on) {
+        el.addEventListener('focus', onElFocus);
+        el.addEventListener('click', onElFocus);
+      } else {
+        el.removeEventListener('focus', onElFocus);
+        el.removeEventListener('click', onElFocus);
+        el.classList.remove('adm-focused');
+      }
+    });
+    document.body.classList.toggle('adm-editing', on);
+    document.body.style.paddingTop = on ? '52px' : '';
+    tb.classList.toggle('on', on);
+    setupImages(on);
+    if (!on) { focusedEl = null; hideCover(); }
+  }
+
+  editCb.addEventListener('change', function () { setEditMode(editCb.checked); });
+  document.getElementById('tb-done').addEventListener('click', function () {
+    editCb.checked = false; setEditMode(false);
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && document.body.classList.contains('adm-editing')) {
+      editCb.checked = false; setEditMode(false);
+    }
+  });
+
+  /* ══ TOOLBAR SYNC ══════════════════════════════════════ */
+  function rgb2hex(rgb) {
+    var m = (rgb || '').match(/\d+/g);
+    if (!m || m.length < 3) return '#000000';
+    return '#' + [m[0],m[1],m[2]].map(function(n){
+      return parseInt(n).toString(16).padStart(2,'0');
+    }).join('');
+  }
+
+  function syncTb(el) {
+    var cs  = window.getComputedStyle(el);
+    var fsPx = parseFloat(cs.fontSize) || 16;
+
+    /* size */
+    document.getElementById('tb-sz').value = Math.round(fsPx);
+
+    /* weight */
+    var wt = parseInt(cs.fontWeight) || 400;
+    var wtSel = document.getElementById('tb-wt');
+    var closest = [100,300,400,500,700,900].reduce(function(p,c){
+      return Math.abs(c-wt) < Math.abs(p-wt) ? c : p;
+    });
+    wtSel.value = String(closest);
+
+    /* italic */
+    document.getElementById('tb-it').classList.toggle('on', cs.fontStyle === 'italic');
+
+    /* underline / strikethrough */
+    var deco = cs.textDecorationLine || cs.textDecoration || '';
+    document.getElementById('tb-ul').classList.toggle('on', deco.indexOf('underline')    !== -1);
+    document.getElementById('tb-st').classList.toggle('on', deco.indexOf('line-through') !== -1);
+
+    /* color */
+    var hex = rgb2hex(cs.color);
+    document.getElementById('tb-col').value = hex;
+    document.getElementById('tb-col-bar').style.background = hex;
+
+    /* alignment */
+    var al = cs.textAlign;
+    ['l','c','r'].forEach(function(a,i){
+      var v = ['left','center','right'][i];
+      document.getElementById('tb-al-'+a).classList.toggle('on',
+        al === v || (al === 'start' && v === 'left'));
+    });
+
+    /* line height */
+    var lhPx = parseFloat(cs.lineHeight);
+    var lh   = isNaN(lhPx) ? 1.8 : Math.min(3.5, Math.max(1, +(lhPx/fsPx).toFixed(2)));
+    document.getElementById('tb-lh').value = lh;
+    document.getElementById('tb-lh-v').textContent = lh.toFixed(1);
+
+    /* letter spacing */
+    var lsPx = parseFloat(cs.letterSpacing);
+    var lsEm = isNaN(lsPx) ? 0 : Math.min(0.5, Math.max(-0.05, +(lsPx/fsPx).toFixed(2)));
+    document.getElementById('tb-ls').value = lsEm;
+    document.getElementById('tb-ls-v').textContent = lsEm.toFixed(2)+'em';
+  }
+
+  /* ══ USER STYLES PERSISTENCE ═══════════════════════════════
+     スタイル変更を #user-styles ブロックに書き出す。
+     Claude の編集は <style> タグ内のクラス定義を変更するが、
+     #user-styles は !important で優先されるため上書きされない。
+  ════════════════════════════════════════════════════════════ */
+  var _usm = {}; /* { selector: { cssProp: val } } */
+
+  function _sel(el) {
+    var cls = Array.from(el.classList).filter(function(c){
+      return !SKIP_CLASSES[c] && !/^adm/.test(c) && c !== 'us-';
+    });
+    if (cls.length) return '.' + cls.join('.');
+    var par = el.parentElement;
+    var idx = par ? Array.from(par.children).indexOf(el) + 1 : 1;
+    return el.tagName.toLowerCase() + ':nth-child(' + idx + ')';
+  }
+  function _keb(s){ return s.replace(/([A-Z])/g,function(m){return '-'+m.toLowerCase();}); }
+  function _flush() {
+    var us = document.getElementById('user-styles');
+    if (!us) { us=document.createElement('style'); us.id='user-styles'; document.head.appendChild(us); }
+    var css = '';
+    Object.keys(_usm).forEach(function(sel){
+      var d = Object.keys(_usm[sel]).map(function(p){ return _keb(p)+':'+_usm[sel][p]+'!important'; }).join(';');
+      if(d) css += sel+'{'+d+'}\n';
+    });
+    us.textContent = css;
+  }
+
+  function ap(prop, val) {
+    if (!focusedEl) return;
+    focusedEl.style[prop] = val;
+    var sel = _sel(focusedEl);
+    if (!_usm[sel]) _usm[sel] = {};
+    _usm[sel][prop] = val;
+    _flush();
+    if (batchMode) {
+      getSiblings(focusedEl).forEach(function(el){
+        el.style[prop] = val;
+        var s = _sel(el);
+        if (!_usm[s]) _usm[s] = {};
+        _usm[s][prop] = val;
+      });
+      _flush();
+    }
+  }
+
+  /* ── font size ── */
+  document.getElementById('tb-sz').addEventListener('change', function () {
+    ap('fontSize', this.value + 'px');
+  });
+  function sizeStep(delta) {
+    if (!focusedEl) return;
+    var cur  = Math.round(parseFloat(window.getComputedStyle(focusedEl).fontSize) || 16);
+    var next = Math.min(200, Math.max(8, cur + delta));
+    focusedEl.style.fontSize = next + 'px';
+    document.getElementById('tb-sz').value = next;
+  }
+  document.getElementById('tb-sz-u').addEventListener('mousedown', function(e){ e.preventDefault(); sizeStep(+1); });
+  document.getElementById('tb-sz-d').addEventListener('mousedown', function(e){ e.preventDefault(); sizeStep(-1); });
+
+  /* ── font weight ── */
+  document.getElementById('tb-wt').addEventListener('change', function(e){
+    e.preventDefault(); ap('fontWeight', this.value);
+  });
+  document.getElementById('tb-wt').addEventListener('mousedown', function(e){ e.stopPropagation(); });
+
+  /* ── italic ── */
+  document.getElementById('tb-it').addEventListener('mousedown', function(e){
+    e.preventDefault();
+    if (!focusedEl) return;
+    var is = window.getComputedStyle(focusedEl).fontStyle === 'italic';
+    focusedEl.style.fontStyle = is ? 'normal' : 'italic';
+    this.classList.toggle('on', !is);
+  });
+
+  /* ── underline ── */
+  document.getElementById('tb-ul').addEventListener('mousedown', function(e){
+    e.preventDefault();
+    if (!focusedEl) return;
+    var deco = window.getComputedStyle(focusedEl).textDecorationLine || '';
+    var has  = deco.indexOf('underline') !== -1;
+    focusedEl.style.textDecoration = has ? 'none' : 'underline';
+    this.classList.toggle('on', !has);
+  });
+
+  /* ── strikethrough ── */
+  document.getElementById('tb-st').addEventListener('mousedown', function(e){
+    e.preventDefault();
+    if (!focusedEl) return;
+    var deco = window.getComputedStyle(focusedEl).textDecorationLine || '';
+    var has  = deco.indexOf('line-through') !== -1;
+    focusedEl.style.textDecoration = has ? 'none' : 'line-through';
+    this.classList.toggle('on', !has);
+  });
+
+  /* ── text color ── */
+  document.getElementById('tb-col').addEventListener('input', function(e){
+    ap('color', e.target.value);
+    document.getElementById('tb-col-bar').style.background = e.target.value;
+  });
+
+  /* ── alignment ── */
+  ['l','c','r'].forEach(function(a, i){
+    var val = ['left','center','right'][i];
+    document.getElementById('tb-al-'+a).addEventListener('mousedown', function(e){
+      e.preventDefault(); ap('textAlign', val);
+      ['l','c','r'].forEach(function(x){ document.getElementById('tb-al-'+x).classList.remove('on'); });
+      this.classList.add('on');
+    });
+  });
+
+  /* ── line height ── */
+  document.getElementById('tb-lh').addEventListener('input', function(){
+    var v = parseFloat(this.value);
+    document.getElementById('tb-lh-v').textContent = v.toFixed(1);
+    ap('lineHeight', String(v));
+  });
+
+  /* ── letter spacing ── */
+  document.getElementById('tb-ls').addEventListener('input', function(){
+    var v = parseFloat(this.value);
+    document.getElementById('tb-ls-v').textContent = v.toFixed(2)+'em';
+    ap('letterSpacing', v+'em');
+  });
+
+  /* ── reset element styles ── */
+  document.getElementById('tb-rst').addEventListener('mousedown', function(e){
+    e.preventDefault();
+    if (!focusedEl) return;
+    focusedEl.removeAttribute('style');
+    var sel = _sel(focusedEl);
+    delete _usm[sel];
+    _flush();
+    syncTb(focusedEl);
+  });
+
+  /* ══ IMAGE REPLACE ═════════════════════════════════════ */
+  var coverTarget = null;
+
+  function showCover(img) {
+    var r = img.getBoundingClientRect();
+    imgCover.style.cssText = 'display:flex;top:'+r.top+'px;left:'+r.left+'px;width:'+r.width+'px;height:'+r.height+'px;';
+    coverTarget = img;
+  }
+  function hideCover() { imgCover.style.display = 'none'; coverTarget = null; }
+
+  function replaceImg(img) {
+    var inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = 'image/*';
+    inp.onchange = function(e) {
+      var f = e.target.files[0]; if (!f) return;
+      var rd = new FileReader();
+      rd.onload = function(ev) { img.src = ev.target.result; hideCover(); };
+      rd.readAsDataURL(f);
+    };
+    inp.click();
+  }
+
+  imgCover.addEventListener('click', function(){ if (coverTarget) replaceImg(coverTarget); });
+  imgCover.addEventListener('mouseleave', function(e){
+    if (!e.relatedTarget || !e.relatedTarget.dataset || !e.relatedTarget.dataset.admImg) hideCover();
+  });
+
+  window.addEventListener('scroll',  function(){ if(coverTarget) showCover(coverTarget); }, {passive:true});
+  window.addEventListener('resize',  function(){ if(coverTarget) showCover(coverTarget); });
+
+  function onImgEnter()    { if(document.body.classList.contains('adm-editing')) showCover(this); }
+  function onImgLeave(e)   { if(!e.relatedTarget || e.relatedTarget.id !== 'adm-img-cover') hideCover(); }
+  function onImgClick(e)   { if(document.body.classList.contains('adm-editing')){ e.preventDefault(); e.stopPropagation(); } }
+
+  function setupImages(on) {
+    document.querySelectorAll('img').forEach(function(img){
+      if (img.closest('#adm') || img.closest('#adm-tb')) return;
+      img.dataset.admImg = '1';
+      img.style.cursor = on ? 'pointer' : '';
+      if (on) {
+        img.addEventListener('mouseenter', onImgEnter);
+        img.addEventListener('mouseleave', onImgLeave);
+        img.addEventListener('click',      onImgClick);
+      } else {
+        img.removeEventListener('mouseenter', onImgEnter);
+        img.removeEventListener('mouseleave', onImgLeave);
+        img.removeEventListener('click',      onImgClick);
+      }
+    });
+  }
+
+  /* ══ BRAND COLORS ══════════════════════════════════════ */
+  function bindColor(inpId, dotId, hexId, cssVar) {
+    var inp = document.getElementById(inpId);
+    var dot = document.getElementById(dotId);
+    var hex = document.getElementById(hexId);
+    if (dot) dot.style.background = inp.value;
+    inp.addEventListener('input', function(e){
+      document.documentElement.style.setProperty(cssVar, e.target.value);
+      if (dot) dot.style.background = e.target.value;
+      if (hex) hex.textContent = e.target.value.toUpperCase();
+    });
+  }
+  bindColor('adm-col-sky',  'adm-dot-sky',  'adm-hex-sky',  '--sky');
+  bindColor('adm-col-deep', 'adm-dot-deep', 'adm-hex-deep', '--deep');
+  bindColor('adm-col-off',  'adm-dot-off',  'adm-hex-off',  '--off');
+  bindColor('adm-col-ink',  'adm-dot-ink',  'adm-hex-ink',  '--ink');
+  ['sky','deep','off','ink'].forEach(function(k){
+    var colors = {sky:'#56C2EC', deep:'#0C3B52', off:'#F5F4F0', ink:'#0D0D0D'};
+    var el = document.getElementById('adm-dot-'+k);
+    if (el) el.style.background = colors[k];
+  });
+
+  /* reset brand colors */
+  var BG_DEF = {'--sky':'#56C2EC','--deep':'#0C3B52','--off':'#F5F4F0','--ink':'#0D0D0D'};
+  var BG_IDS = {
+    '--sky':  ['adm-col-sky',  'adm-dot-sky',  'adm-hex-sky'],
+    '--deep': ['adm-col-deep', 'adm-dot-deep', 'adm-hex-deep'],
+    '--off':  ['adm-col-off',  'adm-dot-off',  'adm-hex-off'],
+    '--ink':  ['adm-col-ink',  'adm-dot-ink',  'adm-hex-ink']
+  };
+  document.getElementById('adm-reset').addEventListener('click', function(){
+    Object.keys(BG_DEF).forEach(function(v){
+      var c = BG_DEF[v], ids = BG_IDS[v];
+      document.documentElement.style.setProperty(v, c);
+      document.getElementById(ids[0]).value = c;
+      document.getElementById(ids[1]).style.background = c;
+      document.getElementById(ids[2]).textContent = c.toUpperCase();
+    });
+  });
+
+  /* ══ SAVE / DOWNLOAD ═══════════════════════════════════ */
+  var fileHandle = null;  /* File System Access API ハンドル */
+
+  /* 画像を canvas で圧縮して base64 に変換 */
+  function imgToB64(img) {
+    try {
+      var MAX = 1400;
+      var w = img.naturalWidth  || img.width  || 800;
+      var h = img.naturalHeight || img.height || 600;
+      var r = w > MAX ? MAX / w : 1;
+      var c = document.createElement('canvas');
+      c.width  = Math.round(w * r);
+      c.height = Math.round(h * r);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      return c.toDataURL('image/jpeg', 0.80);
+    } catch(e) { return null; }
+  }
+
+  /* HTML を生成（保存・DL共通） */
+  function buildHtml() {
+    var wasEditing = editCb.checked;
+    if (wasEditing) setEditMode(false);
+
+    /* CSS変数の現在値を override style に書き込む */
+    var cs   = getComputedStyle(document.documentElement);
+    var sky  = cs.getPropertyValue('--sky').trim();
+    var deep = cs.getPropertyValue('--deep').trim();
+    var off  = cs.getPropertyValue('--off').trim();
+    var ink  = cs.getPropertyValue('--ink').trim();
+    var ovr  = document.getElementById('adm-var-override');
+    if (!ovr) { ovr = document.createElement('style'); ovr.id = 'adm-var-override'; document.head.appendChild(ovr); }
+    ovr.textContent = ':root{--sky:'+sky+';--deep:'+deep+';--off:'+off+';--ink:'+ink+';}';
+
+    /* ローカル画像を base64 に変換して HTML に埋め込む（サーバーでも表示できるように） */
+    var converted = [];
+    document.querySelectorAll('img').forEach(function(img) {
+      if (img.closest('#adm') || img.closest('#adm-tb') || img.closest('#adm-img-cover')) return;
+      var orig = img.getAttribute('src') || '';
+      if (!orig.startsWith('./') && !orig.startsWith('../')) return;  /* ローカルパスのみ */
+      var b64 = imgToB64(img);
+      if (b64) { img.setAttribute('src', b64); converted.push({ el: img, src: orig }); }
+    });
+
+    /* adm パネルを一時的に非表示にしてから outerHTML を取得 */
+    var admEl = document.getElementById('adm');
+    admEl.style.display = 'none';
+    var html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+    admEl.style.display = 'block';
+
+    /* ローカルパスを復元（ローカルでの編集継続のため） */
+    converted.forEach(function(o) { o.el.setAttribute('src', o.src); });
+
+    if (wasEditing) { editCb.checked = true; setEditMode(true); }
+    return html;
+  }
+
+  /* 保存フィードバック */
+  function flashSaveBtn(ok) {
+    var btn   = document.getElementById('adm-save');
+    var label = document.getElementById('adm-save-label');
+    if (ok) {
+      btn.classList.add('saved');
+      label.textContent = '保存しました ✓';
+      setTimeout(function(){
+        btn.classList.remove('saved');
+        label.textContent = '元ファイルに上書き保存';
+      }, 2000);
+    } else {
+      btn.classList.remove('saving');
+    }
+  }
+
+  /* ── 元ファイルに上書き保存（File System Access API） ── */
+  async function saveToFile() {
+    var btn   = document.getElementById('adm-save');
+    var label = document.getElementById('adm-save-label');
+    btn.classList.add('saving');
+    label.textContent = '保存中…';
+
+    var html = buildHtml();
+    var blob = new Blob([html], {type:'text/html;charset=utf-8'});
+
+    try {
+      if (!fileHandle) {
+        /* 初回：Dropbox の solarich300.html を「開く」ダイアログで選択して上書き */
+        var picks = await window.showOpenFilePicker({
+          types: [{ description: 'HTML ファイル', accept: {'text/html': ['.html']} }],
+          multiple: false
+        });
+        fileHandle = picks[0];
+      }
+      /* 書き込み権限を確保 */
+      var perm = await fileHandle.requestPermission({ mode: 'readwrite' });
+      if (perm !== 'granted') { throw new Error('permission denied'); }
+      var writable = await fileHandle.createWritable();
+      await writable.write(blob);
+      await writable.close();
+      btn.classList.remove('saving');
+      flashSaveBtn(true);
+    } catch(e) {
+      btn.classList.remove('saving');
+      label.textContent = '元ファイルに上書き保存';
+      if (e && e.name === 'AbortError') { fileHandle = null; return; }
+      /* API未対応ブラウザはDLにフォールバック */
+      triggerDownload(html);
+    }
+  }
+
+  /* ── ダウンロード（別名保存） ── */
+  function triggerDownload(html) {
+    html = html || buildHtml();
+    var blob = new Blob([html], {type:'text/html;charset=utf-8'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'solarich300.html';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+  }
+
+  document.getElementById('adm-save').addEventListener('click', saveToFile);
+  document.getElementById('adm-dl').addEventListener('click', function(){ triggerDownload(); });
+
+  /* ⌘S / Ctrl+S で保存 */
+  document.addEventListener('keydown', function(e){
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+      e.preventDefault();
+      saveToFile();
+    }
+  });
+
+})();
+</script>
+
+
+</body></html>
