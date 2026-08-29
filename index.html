@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>1500W GALLERY</title>
+  <meta name="description" content="solarich 1500 フォトギャラリー。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:   #0D0D0D;
+      --muted: #9a9a9a;
+      --sky:   #56C2EC;
+      --line:  #ECEAE5;
+      --white: #FFFFFF;
+      --green: #06C755;
+      --font:  'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+      --cta-h: 74px;
+      --gap: 8px;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font); color: var(--ink); background: var(--white);
+      overflow-x: hidden; -webkit-font-smoothing: antialiased;
+      padding-bottom: calc(var(--cta-h) + env(safe-area-inset-bottom));
+    }
+    ::selection { background: rgba(86,194,236,.3); }
+    img { max-width: 100%; display: block; }
+
+    /* ═══ TITLE ══════════════════════════════════ */
+    header {
+      position: sticky; top: 0; z-index: 40;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px 20px calc(20px - var(--gap));
+      background: rgba(255,255,255,.86); backdrop-filter: blur(12px);
+    }
+    .title {
+      font-size: clamp(15px, 3.4vw, 20px); font-weight: 500;
+      letter-spacing: .34em; text-indent: .34em; color: var(--ink);
+    }
+    .title b { color: var(--sky); font-weight: 700; }
+
+    /* ═══ MASONRY GALLERY ════════════════════════ */
+    .gallery {
+      column-count: 1; column-gap: var(--gap);
+      padding: 0 var(--gap);
+      max-width: 1500px; margin: 0 auto;
+    }
+    @media (min-width: 620px)  { .gallery { column-count: 2; } }
+    @media (min-width: 1024px) { .gallery { column-count: 3; --gap: 10px; } }
+
+    .cell {
+      break-inside: avoid; -webkit-column-break-inside: avoid;
+      margin-bottom: var(--gap);
+      border-radius: 4px; overflow: hidden;
+      background: #f2f1ee; cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      display: block; width: 100%; border: 0; padding: 0;
+    }
+    .cell img {
+      width: 100%; height: auto; display: block;
+      opacity: 0; transition: opacity .7s ease, transform .7s cubic-bezier(.22,1,.36,1);
+    }
+    .cell img.loaded { opacity: 1; }
+    @media (hover: hover) { .cell:hover img { transform: scale(1.03); } }
+    .cell:active img { transform: scale(.99); }
+    .cell:focus-visible { outline: 3px solid var(--sky); outline-offset: 2px; }
+
+    /* ═══ STICKY CTA（ボタンのみ） ════════════════ */
+    .cta-bar {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+      background: rgba(255,255,255,.92); backdrop-filter: blur(14px);
+      border-top: 1px solid var(--line);
+      padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+      transform: translateY(0); transition: transform .4s cubic-bezier(.22,1,.36,1);
+    }
+    .cta-bar.hidden { transform: translateY(120%); }
+    .btn-line {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; max-width: 560px; margin: 0 auto;
+      padding: 15px 24px; border-radius: 12px;
+      background: var(--green); color: #fff; text-decoration: none;
+      font-size: 15px; font-weight: 700; letter-spacing: .06em;
+      box-shadow: 0 6px 22px rgba(6,199,85,.3);
+      transition: transform .25s cubic-bezier(.22,1,.36,1), filter .3s;
+    }
+    .btn-line:hover { transform: translateY(-2px); filter: brightness(1.06); }
+    .btn-line svg { width: 21px; height: 21px; flex-shrink: 0; }
+
+    /* ═══ LIGHTBOX ═══════════════════════════════ */
+    #lb {
+      position: fixed; inset: 0; z-index: 200; background: rgba(8,10,12,.97);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity .3s ease;
+      touch-action: pan-y;
+    }
+    #lb.open { opacity: 1; pointer-events: auto; }
+    #lb-img {
+      max-width: 100vw; max-height: 92vh; object-fit: contain;
+      transition: opacity .22s ease; user-select: none;
+    }
+    #lb-img.swap { opacity: 0; }
+    .lb-btn {
+      position: absolute; z-index: 2; background: rgba(255,255,255,.1); border: none;
+      color: #fff; width: 46px; height: 46px; border-radius: 50%;
+      font-size: 21px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(4px); transition: background .25s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .lb-btn:hover { background: rgba(255,255,255,.22); }
+    #lb-close { top: calc(14px + env(safe-area-inset-top)); right: 14px; }
+    #lb-prev { left: 12px; top: 50%; transform: translateY(-50%); }
+    #lb-next { right: 12px; top: 50%; transform: translateY(-50%); }
+    @media (max-width: 759px) { #lb-prev, #lb-next { display: none; } }
+    #lb-count {
+      position: absolute; bottom: calc(18px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
+      color: rgba(255,255,255,.7); font-size: 12px; letter-spacing: .2em; font-variant-numeric: tabular-nums;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+      .cell img { opacity: 1 !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <p class="title">1500W <b>GALLERY</b></p>
+  </header>
+
+  <main class="gallery" id="grid"><!-- JS描画 --></main>
+
+  <!-- STICKY CTA（追従ボタンのみ） -->
+  <div class="cta-bar" id="ctaBar">
+    <a class="btn-line" href="https://liff.line.me/2008711286-p4s7UWc5/landing?follow=%40835xhfwv&lp=Ln2CEB&liff_id=2008711286-p4s7UWc5" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5C6.2 2.5 1.5 6.36 1.5 11.11c0 4.26 3.75 7.83 8.82 8.5.34.07.81.23.93.52.1.27.07.68.03.95l-.15.9c-.04.27-.21 1.05.92.57 1.14-.48 6.12-3.6 8.35-6.17 1.54-1.69 2.1-3.4 2.1-5.27 0-4.75-4.7-8.61-10.5-8.61z"/></svg>
+      先行配信を希望する
+    </a>
+  </div>
+
+  <!-- LIGHTBOX -->
+  <div id="lb" role="dialog" aria-modal="true" aria-label="写真拡大表示">
+    <button class="lb-btn" id="lb-close" aria-label="閉じる">✕</button>
+    <button class="lb-btn" id="lb-prev" aria-label="前の写真">‹</button>
+    <button class="lb-btn" id="lb-next" aria-label="次の写真">›</button>
+    <img id="lb-img" alt="solarich 1500">
+    <p id="lb-count"></p>
+  </div>
+
+  <script>
+    const PHOTOS = [
+      {"f": "s3643.jpg", "w": 2880, "h": 2160},
+      {"f": "s3466.jpg", "w": 2880, "h": 2160},
+      {"f": "s3501.jpg", "w": 2880, "h": 2160},
+      {"f": "s3517.jpg", "w": 2880, "h": 2160},
+      {"f": "s3521.jpg", "w": 2777, "h": 2160},
+      {"f": "s3525.jpg", "w": 2767, "h": 2160},
+      {"f": "s3632.jpg", "w": 2880, "h": 2160},
+      {"f": "s3535.jpg", "w": 2801, "h": 2101},
+      {"f": "s3537.jpg", "w": 2802, "h": 2102},
+      {"f": "s3549.jpg", "w": 2880, "h": 2160},
+      {"f": "s3573.jpg", "w": 2880, "h": 2160},
+      {"f": "s3603.jpg", "w": 2880, "h": 2160},
+      {"f": "s3661.jpg", "w": 2623, "h": 2160},
+      {"f": "s3685.jpg", "w": 2628, "h": 2160},
+      {"f": "s3699.jpg", "w": 2880, "h": 2160},
+      {"f": "s3707.jpg", "w": 2880, "h": 2160},
+      {"f": "s3712.jpg", "w": 2811, "h": 2108},
+      {"f": "s3727.jpg", "w": 2800, "h": 2100},
+      {"f": "s3731.jpg", "w": 2868, "h": 2151},
+      {"f": "s3750.jpg", "w": 2472, "h": 1368},
+      {"f": "s3759.jpg", "w": 2642, "h": 1368},
+      {"f": "s3766.jpg", "w": 2642, "h": 1368},
+      {"f": "s3769.jpg", "w": 2642, "h": 1368},
+      {"f": "s3799.jpg", "w": 2685, "h": 2014},
+      {"f": "s3802.jpg", "w": 2797, "h": 2098}
+    ];
+
+    // ─── グリッド描画 ───
+    const grid = document.getElementById('grid');
+    grid.innerHTML = PHOTOS.map((p, i) =>
+      `<button class="cell" data-i="${i}" style="aspect-ratio:${p.w}/${p.h}" aria-label="写真${i + 1}を拡大">
+        <img src="img/grid/${p.f}" alt="solarich 1500 ${i + 1}" loading="lazy" decoding="async">
+      </button>`
+    ).join('');
+    grid.querySelectorAll('img').forEach(img => {
+      if (img.complete) img.classList.add('loaded');
+      else img.addEventListener('load', () => img.classList.add('loaded'));
+    });
+
+    // ─── ライトボックス ───
+    const lb = document.getElementById('lb');
+    const lbImg = document.getElementById('lb-img');
+    const lbCount = document.getElementById('lb-count');
+    const ctaBar = document.getElementById('ctaBar');
+    let cur = 0;
+
+    function show(i, first) {
+      cur = (i + PHOTOS.length) % PHOTOS.length;
+      const swap = () => {
+        lbImg.src = `img/full/${PHOTOS[cur].f}`;
+        lbCount.textContent = `${cur + 1} / ${PHOTOS.length}`;
+        lbImg.classList.remove('swap');
+      };
+      if (first) swap();
+      else { lbImg.classList.add('swap'); setTimeout(swap, 120); }
+      [cur + 1, cur - 1].forEach(n => {
+        new Image().src = `img/full/${PHOTOS[(n + PHOTOS.length) % PHOTOS.length].f}`;
+      });
+    }
+    function openLb(i) { show(i, true); lb.classList.add('open'); ctaBar.classList.add('hidden'); document.body.style.overflow = 'hidden'; }
+    function closeLb() { lb.classList.remove('open'); ctaBar.classList.remove('hidden'); document.body.style.overflow = ''; }
+
+    grid.addEventListener('click', e => { const c = e.target.closest('.cell'); if (c) openLb(+c.dataset.i); });
+    document.getElementById('lb-close').addEventListener('click', closeLb);
+    document.getElementById('lb-prev').addEventListener('click', e => { e.stopPropagation(); show(cur - 1); });
+    document.getElementById('lb-next').addEventListener('click', e => { e.stopPropagation(); show(cur + 1); });
+    lb.addEventListener('click', e => { if (e.target === lb) closeLb(); });
+    document.addEventListener('keydown', e => {
+      if (!lb.classList.contains('open')) return;
+      if (e.key === 'Escape') closeLb();
+      if (e.key === 'ArrowLeft') show(cur - 1);
+      if (e.key === 'ArrowRight') show(cur + 1);
+    });
+    let tx = 0, ty = 0;
+    lb.addEventListener('touchstart', e => { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
+    lb.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
+      if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.4) show(cur + (dx < 0 ? 1 : -1));
+      else if (dy > 90 && Math.abs(dy) > Math.abs(dx) * 1.4) closeLb();
+    }, { passive: true });
+  </script>
+</body>
+</html>
