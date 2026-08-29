@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>solarich 1500 GALLERY — 先行公開</title>
+  <meta name="description" content="solarich 1500 フォトギャラリー先行公開。2026年11月発売・在庫500台限定。先行配信の登録受付中。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:   #0D0D0D;
+      --mid:   #555;
+      --muted: #999;
+      --sky:   #56C2EC;
+      --sky-m: #1A8FC4;
+      --deep:  #0C3B52;
+      --off:   #F5F4F0;
+      --white: #FFFFFF;
+      --line:  #E8E6E1;
+      --green: #06C755;
+      --font:  'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+      --cta-h: 76px;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font); color: var(--ink); background: var(--white);
+      overflow-x: hidden; -webkit-font-smoothing: antialiased;
+      padding-bottom: calc(var(--cta-h) + env(safe-area-inset-bottom));
+    }
+    ::selection { background: rgba(86,194,236,.3); }
+    img { max-width: 100%; display: block; }
+
+    /* ═══ HEADER ═════════════════════════════════ */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 90;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 20px;
+      background: rgba(255,255,255,.82); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+    }
+    .hd-logo { font-size: 13px; font-weight: 400; letter-spacing: .45em; color: var(--ink); text-decoration: none; }
+    .hd-chip {
+      font-size: 10px; letter-spacing: .22em; text-transform: uppercase;
+      color: var(--sky-m); border: 1px solid rgba(86,194,236,.5);
+      border-radius: 20px; padding: 6px 13px;
+      display: inline-flex; align-items: center; gap: 7px;
+    }
+    .hd-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--sky); animation: dotPulse 2.4s ease-in-out infinite; }
+    @keyframes dotPulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.8); opacity: .35; } }
+
+    /* ═══ REVEAL ═════════════════════════════════ */
+    .reveal { opacity: 0; transform: translateY(22px); transition: opacity .9s cubic-bezier(.22,1,.36,1), transform .9s cubic-bezier(.22,1,.36,1); }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ═══ HERO ═══════════════════════════════════ */
+    .hero { padding: 86px 20px 0; max-width: 1080px; margin: 0 auto; }
+    .hero-eyebrow {
+      font-size: 10px; letter-spacing: .42em; text-transform: uppercase;
+      color: var(--sky-m); display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+    }
+    .hero-eyebrow::before { content: ''; width: 22px; height: 1px; background: var(--sky); }
+    .hero-title { font-size: clamp(27px, 6.4vw, 46px); font-weight: 900; line-height: 1.35; letter-spacing: .01em; }
+    .hero-title .blue { color: var(--sky-m); }
+    .hero-lead { font-size: 13.5px; color: var(--mid); line-height: 2.1; letter-spacing: .06em; margin-top: 14px; }
+    .hero-badges { display: flex; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
+    .badge {
+      font-size: 11px; font-weight: 700; letter-spacing: .12em;
+      padding: 7px 14px; border-radius: 999px;
+    }
+    .badge-fill { background: var(--deep); color: #fff; }
+    .badge-line { border: 1px solid var(--sky-m); color: var(--sky-m); }
+    .hero-photo {
+      margin-top: 26px; border-radius: 14px; overflow: hidden;
+      box-shadow: 0 18px 50px rgba(12,59,82,.14);
+    }
+    .hero-photo img { width: 100%; height: auto; }
+    .hero-cta-inline { margin-top: 26px; }
+
+    /* ═══ CTA BUTTON（共通） ══════════════════════ */
+    .btn-line {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; max-width: 420px; margin: 0 auto;
+      padding: 16px 24px; border-radius: 12px;
+      background: var(--green); color: #fff; text-decoration: none;
+      font-size: 15px; font-weight: 700; letter-spacing: .06em;
+      box-shadow: 0 6px 22px rgba(6,199,85,.32);
+      transition: transform .25s cubic-bezier(.22,1,.36,1), filter .3s;
+      animation: ctaPulse 3.2s ease-in-out infinite;
+    }
+    .btn-line:hover { transform: translateY(-2px); filter: brightness(1.06); }
+    .btn-line svg { width: 21px; height: 21px; flex-shrink: 0; }
+    @keyframes ctaPulse {
+      0%,100% { box-shadow: 0 6px 20px rgba(6,199,85,.3); }
+      50%      { box-shadow: 0 6px 34px rgba(6,199,85,.5), 0 0 0 8px rgba(6,199,85,.06); }
+    }
+    .cta-note { text-align: center; font-size: 10.5px; color: var(--muted); letter-spacing: .1em; margin-top: 10px; }
+
+    /* ═══ GALLERY GRID ═══════════════════════════ */
+    .gallery { max-width: 1080px; margin: 0 auto; padding: 54px 12px 0; }
+    .g-head { text-align: center; margin-bottom: 30px; padding: 0 12px; }
+    .g-head .en { font-size: 10px; letter-spacing: .42em; text-indent: .42em; text-transform: uppercase; color: var(--sky-m); margin-bottom: 12px; }
+    .g-head h2 { font-size: clamp(20px, 4.8vw, 30px); font-weight: 900; letter-spacing: .06em; }
+    .g-head p { font-size: 12px; color: var(--muted); margin-top: 10px; letter-spacing: .08em; }
+    #grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    @media (min-width: 760px) { #grid { grid-template-columns: repeat(3, 1fr); gap: 12px; } }
+    .g-item {
+      position: relative; border-radius: 10px; overflow: hidden; cursor: pointer;
+      background: var(--off); border: 0; padding: 0; width: 100%;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .g-item.wide { grid-column: span 2; }
+    .g-item img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform .6s cubic-bezier(.22,1,.36,1), opacity .6s ease;
+      opacity: 0;
+    }
+    .g-item img.loaded { opacity: 1; }
+    .g-item:active img { transform: scale(.98); }
+    @media (hover: hover) { .g-item:hover img { transform: scale(1.04); } }
+    .g-item:focus-visible { outline: 3px solid var(--sky); outline-offset: 2px; }
+
+    /* ═══ STATEMENT CARDS（グリッド内挿入） ═══════ */
+    .g-card {
+      grid-column: 1 / -1; border-radius: 12px;
+      background: var(--off); padding: 34px 24px; text-align: center;
+      margin: 6px 0;
+    }
+    .g-card .en { font-size: 9px; letter-spacing: .4em; text-indent: .4em; text-transform: uppercase; color: var(--sky-m); margin-bottom: 14px; }
+    .g-card h3 { font-size: clamp(18px, 4.6vw, 26px); font-weight: 900; letter-spacing: .05em; line-height: 1.6; }
+    .g-card h3 .blue { color: var(--sky-m); }
+    .g-card p { font-size: 12.5px; color: var(--mid); line-height: 2.1; margin-top: 12px; letter-spacing: .06em; }
+    .g-specs { display: flex; justify-content: center; gap: 26px; margin-top: 20px; flex-wrap: wrap; }
+    .g-spec b { display: block; font-size: clamp(22px, 5.5vw, 30px); font-weight: 300; letter-spacing: 0; font-variant-numeric: tabular-nums; }
+    .g-spec b small { font-size: .5em; color: var(--sky-m); font-weight: 500; margin-left: 2px; }
+    .g-spec span { display: block; font-size: 10px; color: var(--muted); letter-spacing: .2em; margin-top: 6px; }
+    .g-card--navy { background: var(--deep); }
+    .g-card--navy .en { color: var(--sky); }
+    .g-card--navy h3 { color: #fff; }
+    .g-card--navy h3 .blue { color: var(--sky); }
+    .g-card--navy p { color: rgba(255,255,255,.75); }
+
+    /* ═══ CLOSING CTA ════════════════════════════ */
+    .closing { max-width: 640px; margin: 0 auto; padding: 70px 24px 60px; text-align: center; }
+    .closing .en { font-size: 10px; letter-spacing: .42em; text-indent: .42em; text-transform: uppercase; color: var(--sky-m); margin-bottom: 16px; }
+    .closing h2 { font-size: clamp(22px, 5.6vw, 34px); font-weight: 900; letter-spacing: .05em; line-height: 1.6; }
+    .closing p { font-size: 13px; color: var(--mid); line-height: 2.2; letter-spacing: .06em; margin: 18px 0 28px; }
+
+    footer { border-top: 1px solid var(--line); padding: 34px 20px 26px; text-align: center; }
+    .ft-logo { font-size: 12px; letter-spacing: .45em; text-indent: .45em; color: var(--ink); }
+    .ft-note { font-size: 9.5px; color: var(--muted); letter-spacing: .15em; margin-top: 12px; line-height: 1.9; }
+
+    /* ═══ STICKY BOTTOM CTA ══════════════════════ */
+    .cta-bar {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 95;
+      background: rgba(255,255,255,.92); backdrop-filter: blur(14px);
+      border-top: 1px solid var(--line);
+      padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+      transform: translateY(0); transition: transform .4s cubic-bezier(.22,1,.36,1);
+    }
+    .cta-bar.hidden { transform: translateY(110%); }
+    .cta-bar .btn-line { max-width: 560px; padding: 14px 24px; font-size: 14px; animation: none; }
+    .cta-bar-inner { display: flex; align-items: center; gap: 12px; max-width: 640px; margin: 0 auto; }
+    .cta-bar-label { display: none; }
+    @media (min-width: 640px) {
+      .cta-bar-label { display: block; flex-shrink: 0; font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--deep); line-height: 1.6; }
+      .cta-bar-label small { display: block; font-weight: 400; color: var(--muted); font-size: 9.5px; }
+    }
+
+    /* ═══ LIGHTBOX ═══════════════════════════════ */
+    #lb {
+      position: fixed; inset: 0; z-index: 200; background: rgba(5,11,16,.96);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity .3s ease;
+      touch-action: pan-y;
+    }
+    #lb.open { opacity: 1; pointer-events: auto; }
+    #lb-img {
+      max-width: 100vw; max-height: 86vh; object-fit: contain;
+      transition: opacity .22s ease, transform .22s ease; user-select: none;
+    }
+    #lb-img.swap { opacity: 0; }
+    .lb-btn {
+      position: absolute; z-index: 2; background: rgba(255,255,255,.1); border: none;
+      color: #fff; width: 44px; height: 44px; border-radius: 50%;
+      font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(4px); transition: background .25s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .lb-btn:hover { background: rgba(255,255,255,.22); }
+    #lb-close { top: calc(14px + env(safe-area-inset-top)); right: 14px; }
+    #lb-prev { left: 10px; top: 50%; transform: translateY(-50%); }
+    #lb-next { right: 10px; top: 50%; transform: translateY(-50%); }
+    @media (max-width: 759px) { #lb-prev, #lb-next { display: none; } }
+    #lb-count {
+      position: absolute; bottom: calc(20px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
+      color: rgba(255,255,255,.75); font-size: 12px; letter-spacing: .2em; font-variant-numeric: tabular-nums;
+    }
+    .lb-hint {
+      position: absolute; bottom: calc(44px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
+      color: rgba(255,255,255,.4); font-size: 10px; letter-spacing: .2em;
+    }
+    @media (min-width: 760px) { .lb-hint { display: none; } }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+      .reveal { opacity: 1 !important; transform: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a class="hd-logo" href="#">solarich</a>
+    <span class="hd-chip"><span class="hd-dot"></span>2026.11 発売</span>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <p class="hero-eyebrow">First Look Gallery</p>
+    <h1 class="hero-title">solarich 1500、<br>はじめて<span class="blue">見せます</span>。</h1>
+    <p class="hero-lead">2026年11月発売。ソラリッチ史上最大の新モデルを、<br>発売に先がけてフォトギャラリーで先行公開します。</p>
+    <div class="hero-badges">
+      <span class="badge badge-fill">発売決定</span>
+      <span class="badge badge-line">在庫500台限定</span>
+    </div>
+    <figure class="hero-photo" id="heroPhoto">
+      <!-- BUILD: hero image -->
+    </figure>
+    <div class="hero-cta-inline">
+      <!-- ★LINE友だち追加URLに差し替え（全2箇所: ここと下部バー） -->
+      <a class="btn-line" href="https://lin.ee/XXXXXXXX" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5C6.2 2.5 1.5 6.36 1.5 11.11c0 4.26 3.75 7.83 8.82 8.5.34.07.81.23.93.52.1.27.07.68.03.95l-.15.9c-.04.27-.21 1.05.92.57 1.14-.48 6.12-3.6 8.35-6.17 1.54-1.69 2.1-3.4 2.1-5.27 0-4.75-4.7-8.61-10.5-8.61z"/></svg>
+        先行配信を希望する
+      </a>
+      <p class="cta-note">発売日・価格・先行販売のご案内をLINEで最速配信｜登録は3秒</p>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section class="gallery">
+    <div class="g-head reveal">
+      <p class="en">Gallery</p>
+      <h2>写真で、先に体験。</h2>
+      <p>タップで拡大 ／ スワイプで次の一枚へ</p>
+    </div>
+    <div id="grid"><!-- JSで描画 --></div>
+  </section>
+
+  <!-- CLOSING -->
+  <section class="closing reveal">
+    <p class="en">Coming 2026.11</p>
+    <h2>欲しくなったら、<br><span style="color:var(--sky-m)">今のうちに。</span></h2>
+    <p>前作 solarich 1000 は、発売1ヶ月で完売しました。<br>solarich 1500 は新品バッテリーをお届けするため<b>在庫500台限定</b>。<br>先行配信に登録して、誰よりも早く予約してください。</p>
+    <a class="btn-line" href="https://lin.ee/XXXXXXXX" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5C6.2 2.5 1.5 6.36 1.5 11.11c0 4.26 3.75 7.83 8.82 8.5.34.07.81.23.93.52.1.27.07.68.03.95l-.15.9c-.04.27-.21 1.05.92.57 1.14-.48 6.12-3.6 8.35-6.17 1.54-1.69 2.1-3.4 2.1-5.27 0-4.75-4.7-8.61-10.5-8.61z"/></svg>
+      先行配信を希望する
+    </a>
+    <p class="cta-note">先行登録者限定の予約特典（ポイント2倍）をご用意しています</p>
+  </section>
+
+  <footer>
+    <p class="ft-logo">solarich</p>
+    <p class="ft-note">solarich 1500 — Coming 2026.11<br>© 2026 solarich. All rights reserved.</p>
+  </footer>
+
+  <!-- STICKY CTA -->
+  <div class="cta-bar" id="ctaBar">
+    <div class="cta-bar-inner">
+      <p class="cta-bar-label">solarich 1500<small>2026.11 発売｜500台限定</small></p>
+      <a class="btn-line" href="https://lin.ee/XXXXXXXX" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5C6.2 2.5 1.5 6.36 1.5 11.11c0 4.26 3.75 7.83 8.82 8.5.34.07.81.23.93.52.1.27.07.68.03.95l-.15.9c-.04.27-.21 1.05.92.57 1.14-.48 6.12-3.6 8.35-6.17 1.54-1.69 2.1-3.4 2.1-5.27 0-4.75-4.7-8.61-10.5-8.61z"/></svg>
+        先行配信を希望する
+      </a>
+    </div>
+  </div>
+
+  <!-- LIGHTBOX -->
+  <div id="lb" role="dialog" aria-modal="true" aria-label="写真拡大表示">
+    <button class="lb-btn" id="lb-close" aria-label="閉じる">✕</button>
+    <button class="lb-btn" id="lb-prev" aria-label="前の写真">‹</button>
+    <button class="lb-btn" id="lb-next" aria-label="次の写真">›</button>
+    <img id="lb-img" alt="solarich 1500">
+    <p class="lb-hint">← スワイプで前後の写真 →</p>
+    <p id="lb-count"></p>
+  </div>
+
+  <script>
+    // ─── 写真マニフェスト（build_gallery.pyが生成） ───
+    // {f: ファイル名, w/h: 縦横比計算用, wide: 2カラムぶち抜き}
+    const PHOTOS = [
+      /* BUILD:PHOTOS */
+    ];
+    const HERO = null; /* BUILD:HERO */
+    // グリッド内に差し込むカード（何枚目の後に入れるか）
+    const CARDS = {
+      6: `<div class="g-card reveal">
+            <p class="en">Power</p>
+            <h3>家のコンセントが、<span class="blue">そのまま外へ。</span></h3>
+            <div class="g-specs">
+              <div class="g-spec"><b>1500<small>W</small></b><span>定格出力</span></div>
+              <div class="g-spec"><b>1024<small>Wh</small></b><span>容量</span></div>
+              <div class="g-spec"><b>11<small>kg</small></b><span>重量</span></div>
+            </div>
+          </div>`,
+      14: `<div class="g-card g-card--navy reveal">
+            <p class="en">Limited</p>
+            <h3>在庫<span class="blue">500台</span>限定。</h3>
+            <p>つくりたての新品バッテリーをお届けするため、初回生産分のみ。<br>前作は1ヶ月で完売 — 完売後の再入荷は未定です。</p>
+          </div>`
+    };
+
+    // ─── ヒーロー描画 ───
+    if (HERO) {
+      document.getElementById('heroPhoto').innerHTML =
+        `<img src="img/large/${HERO.f}" width="${HERO.w}" height="${HERO.h}" alt="solarich 1500" fetchpriority="high">`;
+    }
+
+    // ─── グリッド描画 ───
+    const grid = document.getElementById('grid');
+    let html = '';
+    PHOTOS.forEach((p, i) => {
+      html += `<button class="g-item${p.wide ? ' wide' : ''}" data-i="${i}" style="aspect-ratio:${p.w}/${p.h}" aria-label="写真${i + 1}を拡大">
+        <img src="img/thumb/${p.f}" alt="solarich 1500 photo ${i + 1}" loading="lazy" decoding="async">
+      </button>`;
+      if (CARDS[i + 1]) html += CARDS[i + 1];
+    });
+    grid.innerHTML = html;
+    grid.querySelectorAll('.g-item img').forEach(img => {
+      if (img.complete) img.classList.add('loaded');
+      else img.addEventListener('load', () => img.classList.add('loaded'));
+    });
+
+    // ─── reveal ───
+    const io = new IntersectionObserver(es => es.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+    }), { threshold: .18 });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+    // ─── ライトボックス ───
+    const lb = document.getElementById('lb');
+    const lbImg = document.getElementById('lb-img');
+    const lbCount = document.getElementById('lb-count');
+    const ctaBar = document.getElementById('ctaBar');
+    let cur = 0;
+
+    function show(i, first) {
+      cur = (i + PHOTOS.length) % PHOTOS.length;
+      const swap = () => {
+        lbImg.src = `img/large/${PHOTOS[cur].f}`;
+        lbCount.textContent = `${cur + 1} / ${PHOTOS.length}`;
+        lbImg.classList.remove('swap');
+      };
+      if (first) swap();
+      else { lbImg.classList.add('swap'); setTimeout(swap, 120); }
+      // 隣接プリロード
+      [cur + 1, cur - 1].forEach(n => {
+        const p = PHOTOS[(n + PHOTOS.length) % PHOTOS.length];
+        new Image().src = `img/large/${p.f}`;
+      });
+    }
+    function openLb(i) {
+      show(i, true); lb.classList.add('open');
+      ctaBar.classList.add('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeLb() {
+      lb.classList.remove('open');
+      ctaBar.classList.remove('hidden');
+      document.body.style.overflow = '';
+    }
+    grid.addEventListener('click', e => {
+      const item = e.target.closest('.g-item');
+      if (item) openLb(+item.dataset.i);
+    });
+    document.getElementById('lb-close').addEventListener('click', closeLb);
+    document.getElementById('lb-prev').addEventListener('click', e => { e.stopPropagation(); show(cur - 1); });
+    document.getElementById('lb-next').addEventListener('click', e => { e.stopPropagation(); show(cur + 1); });
+    lb.addEventListener('click', e => { if (e.target === lb) closeLb(); });
+    document.addEventListener('keydown', e => {
+      if (!lb.classList.contains('open')) return;
+      if (e.key === 'Escape') closeLb();
+      if (e.key === 'ArrowLeft') show(cur - 1);
+      if (e.key === 'ArrowRight') show(cur + 1);
+    });
+    // スワイプ
+    let tx = 0, ty = 0;
+    lb.addEventListener('touchstart', e => { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
+    lb.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - tx;
+      const dy = e.changedTouches[0].clientY - ty;
+      if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.4) show(cur + (dx < 0 ? 1 : -1));
+      else if (dy > 90 && Math.abs(dy) > Math.abs(dx) * 1.4) closeLb();
+    }, { passive: true });
+  </script>
+</body>
+</html>
